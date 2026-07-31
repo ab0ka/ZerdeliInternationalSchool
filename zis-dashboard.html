@@ -567,6 +567,7 @@ tbody tr.sel .rank{color:var(--brand)}
 .orbwrap::before{content:'';position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(ellipse 46% 62% at 50% 50%,rgba(102,212,22,.15),transparent 68%)}
 .orbstage{position:relative}
+.orbit-mobile{display:none}
 #orb{width:100%;height:auto;display:block;position:relative}
 @keyframes orbflow{to{stroke-dashoffset:-260}}
 .orb-r{animation:orbflow 14s linear infinite}
@@ -698,6 +699,8 @@ body::after{content:'';position:fixed;left:0;right:0;bottom:0;height:84px;z-inde
   .tl .c{font-size:14.5px;margin-top:4px}
 }
 @media (max-width:1050px){
+  .tbl{max-width:100%;overflow-x:auto}
+  .tbl table{min-width:820px}
   .annual-centerbar{grid-template-columns:repeat(4,minmax(0,1fr))}
   .annual-centerbar button:nth-child(4n){border-right:0}
   .annual-panel{grid-template-columns:1fr;min-height:0}
@@ -706,14 +709,193 @@ body::after{content:'';position:fixed;left:0;right:0;bottom:0;height:84px;z-inde
   .annual-summary .caption{margin-top:0}.annual-summary .latest{grid-row:1/3;grid-column:2;margin:0}
   .annual-summary .delta,.annual-summary .range{grid-column:1}.annual-note{grid-column:1/-1}
 }
-@media (max-width:700px){
+@media (min-width:901px) and (max-width:1180px){
+  header{padding:0 28px;gap:14px}
+  .logo span{display:none}
+  nav{margin-left:0;overflow-x:auto;scrollbar-width:none}
+  nav::-webkit-scrollbar{display:none}
+  nav a{padding:9px 11px;font-size:14px}
+  .link{width:40px;height:40px;padding:0;justify-content:center}
+  .link span{display:none}
+  main{padding-left:28px;padding-right:28px}
+}
+@media (max-width:900px){
+  :root{--hdr:108px;--r:16px;--r2:11px}
+  html{scrollbar-gutter:auto}
+  body{font-size:15px;overflow-x:hidden;background-attachment:scroll}
+  body::after{display:none}
+
+  header{height:var(--hdr);padding:7px 14px 6px;gap:7px 9px;flex-wrap:wrap;align-content:center}
+  .logo{gap:8px;margin-right:auto}
+  .logo .mark{height:31px}
+  .logo b{font-size:16px}
+  .logo span{display:none}
+  .lang{padding:2px}
+  .lang button{font-size:10.5px;padding:5px 8px}
+  .link{width:34px;height:34px;padding:0;justify-content:center}
+  .link span{display:none}
+  .fs{width:34px;height:34px}
+  .fs svg{width:17px;height:17px}
+  nav{order:3;flex:0 0 100%;gap:3px;margin:0;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity}
+  nav::-webkit-scrollbar{display:none}
+  nav a{flex:0 0 auto;padding:6px 10px;border-radius:9px;font-size:12.5px;scroll-snap-align:start}
+  .sheet-gate{inset:var(--hdr) 0 0;padding:24px}
+
+  main{padding:var(--hdr) 14px 64px;overflow:hidden}
+  section{padding-top:52px;scroll-margin-top:var(--hdr)}
+  h2{font-size:34px;letter-spacing:-.025em}
+  .sub{font-size:14.5px;margin-top:8px}
+  .sechead{align-items:flex-start;gap:20px;margin-bottom:20px}
+  .headstats{width:100%;gap:28px;justify-content:flex-start}
+  .hs{text-align:left}
+  .hs .v{font-size:34px}
+  .hs .l{font-size:12.5px;margin-top:5px}
+  .card{padding:20px}
+
+  #s1{height:auto;min-height:0;padding:22px 0 30px;overflow:visible}
+  .heroTop{display:block}
+  .heroTl{font-size:13px;margin-top:13px;line-height:1.75}
+  .heroTl s{margin-right:10px}
+  .heroTop .years{max-width:none;margin-top:17px;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;
+    scrollbar-width:none;scroll-snap-type:x proximity;padding-bottom:2px}
+  .heroTop .years::-webkit-scrollbar{display:none}
+  .yr{flex:0 0 auto;padding:7px 13px;font-size:13px;scroll-snap-align:start}
+  .heroMap{flex:none;min-height:0;margin:14px 0 20px}
+  .heroMap::before{inset:-3% -25%;background:radial-gradient(ellipse 72% 38% at 50% 28%,rgba(102,212,22,.16),transparent 72%)}
+  #map{height:290px;margin:0;transform:scale(1.13);transform-origin:center}
+  .clabel{font-size:23px}
+  .citypanel{position:relative;right:auto;top:auto;bottom:auto;width:100%;min-height:0;margin-top:8px;
+    padding:18px;overflow:visible;background:rgba(20,25,17,.94)}
+  .cp-name{font-size:26px}
+  .cp-meta{font-size:13px}
+  .cp-agg{gap:34px;margin-top:13px;padding-bottom:13px}
+  .cp-agg b{font-size:23px}
+  .cp-list{gap:8px;margin-top:12px}
+  .cp-s{min-height:0;padding:13px 14px}
+  .cp-s .n{font-size:15px}
+  .cp-s .r{gap:7px 13px;font-size:12.5px}
+  .heroStats{grid-template-columns:repeat(2,minmax(0,1fr));padding-top:0}
+  .hstat{min-width:0;padding:17px 9px;border-left:1px solid rgba(255,255,255,.075)}
+  .hstat:first-child,.hstat:nth-child(3){padding-left:0;border-left:0}
+  .hstat:nth-child(n+3){border-top:1px solid rgba(255,255,255,.075)}
+  .hstat b{font-size:38px;letter-spacing:-.03em}
+  .hstat span{font-size:13px;margin-top:8px}
+  .hstat i{font-size:11.5px;margin-top:5px}
+
+  .tbl{background:transparent;border-radius:0;overflow:visible}
+  .tbl table,.tbl tbody{display:block;width:100%;min-width:0}
+  .tbl thead{display:none}
+  .tbl tbody{display:grid;gap:12px}
+  .tbl tbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;
+    width:100%;padding:15px 16px;background:var(--s1);border:1px solid rgba(255,255,255,.055);border-radius:var(--r)}
+  .tbl tbody tr:hover{background:var(--s2)}
+  .tbl tbody tr.sel{background:rgba(102,212,22,.09);border-color:rgba(102,212,22,.24)}
+  .tbl tbody td{display:flex;min-width:0;height:auto;padding:0;text-align:left!important;border:0;
+    flex-direction:column;align-items:flex-start;gap:3px}
+  .tbl tbody td::before{content:attr(data-label);color:var(--ink4);font-size:10.5px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.04em}
+  .tbl tbody td:first-child{display:none}
+  .tbl tbody td:nth-child(2){grid-column:1/-1;padding-bottom:11px;border-bottom:1px solid rgba(255,255,255,.06)}
+  .tbl tbody td:nth-child(2)::before{display:none}
+  .tbl .sname{font-size:16px;line-height:1.3}
+  .tbl .city{font-size:14px;color:var(--ink2)}
+  .tbl .big{font-size:19px}
+  .tbl .mut{font-size:16px}
+  .profile{grid-template-columns:1fr;gap:12px;margin-top:16px}
+  .pgrid{gap:15px}
+  .mb{grid-template-columns:82px 1fr 28px;gap:9px;font-size:12.5px}
+
+  .gr{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .donut{padding:18px 10px}
+  .donut svg{max-width:140px}
+  .donut .s{font-size:15px;margin-top:10px;line-height:1.3}
+  .donut .n{font-size:12px}
+  .untcol{gap:12px}
+  .untc{padding:16px 14px}
+  .untc .v{font-size:38px}
+  .untc .l{font-size:12.5px;margin-top:7px}
+
+  .annual-frame{margin-top:50px}
   .annual-controls,.annual-picker.metric{width:100%}
+  .annual-picker select{font-size:13px}
   .annual-centerbar{display:flex;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity}
   .annual-centerbar::-webkit-scrollbar{display:none}
-  .annual-centerbar button{flex:0 0 178px;scroll-snap-align:start}
-  .annual-panel{padding:20px 16px;gap:18px}
+  .annual-centerbar button{flex:0 0 168px;height:54px;scroll-snap-align:start}
+  .annual-panel{padding:18px 14px;gap:18px;min-height:0}
+  .annual-chart{overflow-x:auto;justify-content:flex-start;scrollbar-width:thin;scrollbar-color:#416f2c var(--s1)}
+  .annual-chart svg{width:620px;max-width:none;height:240px;flex:0 0 auto}
+  .annual-summary{display:block;padding-top:18px}
+  .annual-summary .caption{margin-top:0}
+  .annual-summary .latest{margin-top:4px}
   .annual-summary .latest{font-size:52px}
+
+  .blockhead{align-items:flex-start;gap:18px;margin:50px 0 20px}
+  .blockhead h3{font-size:29px}
+  .winmain{grid-template-columns:1fr;gap:12px}
+  .wincharts{gap:12px}
+  .chartcard,.winlistcard{padding:18px 16px}
+  .crow{grid-template-columns:minmax(86px,112px) 1fr 28px;gap:9px;padding:7px 5px;margin:0 -5px}
+  .crow .t{font-size:12.5px}
+  .winfilter{gap:6px;margin:16px 0 13px}
+  .wf{font-size:12.5px;padding:7px 11px}
+  .winlist{max-height:520px;padding-right:4px}
+  .wrow{padding:10px;gap:8px}
+  .wrow .n{font-size:13px}
+  .wrow .m{font-size:11.5px}
+
+  .dumb{padding:20px 16px;overflow-x:auto;scrollbar-width:thin;scrollbar-color:#416f2c var(--s1)}
+  .dumb .ghero,.dumb .gplot,.dumb .dlegend{min-width:620px}
+  .ghero .cap{margin-left:0;text-align:left}
+  .gplot{gap:14px;height:210px}
+
+  .staff{grid-template-columns:1fr;gap:12px}
+  .sidestat{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .ss{padding:19px 16px}
+  .ss .v{font-size:38px}
+  .ss .l{font-size:12.5px}
+  .rung{grid-template-columns:84px minmax(0,1fr) 30px;gap:9px;margin-bottom:13px}
+  .rung .nm{font-size:12px;line-height:1.25}
+  .rung .track{height:28px;border-radius:8px}
+  .rung .n{font-size:19px}
+  .marks{grid-template-columns:1fr;gap:12px;margin-top:12px}
+  .mk{padding:18px}
+
+  .feats,.vals,.syn{grid-template-columns:1fr;gap:12px}
+  .fcard{padding:20px 18px;gap:15px}
+  .fcard .i{width:38px;height:38px;border-radius:10px}
+  .fcard .h{font-size:17px}
+  .fcard .d{font-size:13.5px;margin-top:6px}
+  .vals{margin-top:12px}
+  .vl{padding:20px}
+
   .share-stage{min-height:calc(100vh - var(--hdr));padding-bottom:50px}
+  .share-stage h2{font-size:34px;line-height:1.05}
+  .share-sub{font-size:14.5px}
+  .share-qr{width:210px;margin-top:25px}
+  .share-note{font-size:12.5px;text-align:left}
+  #s6>.strategy-head{margin-top:52px}
+  .orbstage{display:none}
+  .orbwrap{padding:0;background:transparent;box-shadow:none;overflow:visible}
+  .orbwrap::before{display:none}
+  .orbit-mobile{display:grid;grid-template-columns:1fr;gap:10px}
+  .orbit-item{width:100%;border:1px solid rgba(255,255,255,.06);border-radius:var(--r);background:var(--s1);
+    color:var(--ink);padding:16px;display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;
+    gap:12px;text-align:left;font:inherit;cursor:pointer}
+  .orbit-item.on{border-color:rgba(102,212,22,.34);background:rgba(102,212,22,.09)}
+  .orbit-icon{width:42px;height:42px;border-radius:12px;background:rgba(102,212,22,.12);
+    display:flex;align-items:center;justify-content:center}
+  .orbit-icon svg{width:22px;height:22px;stroke:var(--brand);stroke-width:1.7;fill:none;
+    stroke-linecap:round;stroke-linejoin:round}
+  .orbit-copy{min-width:0;display:flex;flex-direction:column;gap:3px}
+  .orbit-copy b{font-size:14.5px;line-height:1.25}
+  .orbit-copy small{color:var(--ink3);font-size:11.5px;line-height:1.35}
+  .orbit-nums{display:flex;align-items:baseline;gap:5px;white-space:nowrap}
+  .orbit-nums b{color:var(--brand);font-size:21px}
+  .orbit-nums i{color:var(--ink4);font-style:normal;font-size:12px}
+  .orbit-nums strong{color:var(--ink2);font-size:14px}
+  .orbit-qual{color:var(--brand);font-size:10.5px;font-weight:700;padding:4px 7px;border-radius:7px;
+    background:rgba(102,212,22,.12);white-space:nowrap}
+  footer{margin-top:52px;font-size:12.5px}
 }
 </style>
 </head>
@@ -1275,14 +1457,14 @@ function secSchools(){
   <thead><tr><th>${T.th.rank[lang]}</th>${cols.map(k=>
     `<th class="${sk===k?'sorted':''}" onclick="sortBy('${k}')">${T.th[k][lang]}${sk===k?(sd>0?' ▲':' ▼'):''}</th>`).join('')}</tr></thead>
   <tbody>${rows.map((r,i)=>`<tr class="${r.id===sel?'sel':''}" onclick="pick('${r.id}')">
-    <td><span class="rank num">${String(i+1).padStart(2,'0')}</span></td>
-    <td><div class="sname"><span class="sdot" style="background:${cv(r.c)}"></span>${r.name}</div></td>
-    <td class="city">${r.city[lang]}</td>
-    <td class="city num">${r.year}</td>
-    <td><span class="big num">${r.students??''}</span>${r.students==null?D:''}</td>
-    <td><span class="big num">${r.teachers??''}</span>${r.teachers==null?D:''}</td>
-    <td><span class="big num pos">${r.grants!=null?r.grants.toFixed(1).replace('.',',')+'%':''}</span>${r.grants==null?D:''}</td>
-    <td><span class="big num pos">${r.nishGrants!=null?r.nishGrants.toFixed(1).replace('.',',')+'%':''}</span>${r.nishGrants==null?D:''}</td>
+    <td data-label="${T.th.rank[lang]}"><span class="rank num">${String(i+1).padStart(2,'0')}</span></td>
+    <td data-label="${T.th.school[lang]}"><div class="sname"><span class="sdot" style="background:${cv(r.c)}"></span>${r.name}</div></td>
+    <td class="city" data-label="${T.th.city[lang]}">${r.city[lang]}</td>
+    <td class="city num" data-label="${T.th.year[lang]}">${r.year}</td>
+    <td data-label="${T.th.students[lang]}"><span class="big num">${r.students??''}</span>${r.students==null?D:''}</td>
+    <td data-label="${T.th.teachers[lang]}"><span class="big num">${r.teachers??''}</span>${r.teachers==null?D:''}</td>
+    <td data-label="${T.th.grants[lang]}"><span class="big num pos">${r.grants!=null?r.grants.toFixed(1).replace('.',',')+'%':''}</span>${r.grants==null?D:''}</td>
+    <td data-label="${T.th.nishGrants[lang]}"><span class="big num pos">${r.nishGrants!=null?r.nishGrants.toFixed(1).replace('.',',')+'%':''}</span>${r.nishGrants==null?D:''}</td>
   </tr>`).join('')}</tbody></table></div>
  <div class="profile">
    <div class="card" style="display:flex;flex-direction:column">
@@ -1651,6 +1833,17 @@ function orbTip(){
    <button class="cls" onclick="setOrb(${orbSel})">×</button>${body}</div>`;
 }
 
+function orbitMobile(){
+ return `<div class="orbit-mobile">${ORBIT.map((o,i)=>{
+   const metric=o.tgt==null
+    ? `<span class="orbit-qual">${t('qualTag')}</span>`
+    : `<span class="orbit-nums"><b class="num">${o.now.toLocaleString('ru-RU')}</b><i>→</i><strong class="num">${o.tgt.toLocaleString('ru-RU')}</strong></span>`;
+   return `<button type="button" class="orbit-item ${orbSel===i?'on':''}" onclick="setOrb(${i})">
+    <span class="orbit-icon"><svg viewBox="0 0 24 24">${OIC[o.ic]}</svg></span>
+    <span class="orbit-copy"><b>${lang==='kz'?o.sk:o.sr}</b><small>${o[lang]}</small></span>${metric}</button>`;
+  }).join('')}</div>`;
+}
+
 function secStrategy(){
  return `<section id="s6"><div class="share-stage" id="dashboard-share">
    <div class="share-kicker">${t('shareKicker')}</div>
@@ -1668,7 +1861,7 @@ function secStrategy(){
        <div class="l">${lang==='kz'?'жаңа қалаға шығу':'новых городов'}</div></div>
    </div></div>
 
- <div class="orbwrap"><div class="orbstage">${orbitSvg()}${orbTip()}</div></div>
+ <div class="orbwrap"><div class="orbstage">${orbitSvg()}${orbTip()}</div>${orbitMobile()}</div>
 
  <footer>${t('foot')}</footer></section>`;
 }
