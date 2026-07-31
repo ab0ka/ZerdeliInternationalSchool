@@ -204,8 +204,8 @@ h2{font-size:clamp(36px,3.3vw,54px);font-weight:600;letter-spacing:-.032em;line-
 }
 .clabel{transition:font-size .2s}
 
-/* Панель занимает всю высоту карты: отдельный скролл внутри неё не нужен. */
-.citypanel{position:absolute;right:0;top:0;bottom:0;height:100%;
+/* Панель поднимается к фильтру годов и заканчивается вместе с картой. */
+.citypanel{position:absolute;right:0;top:clamp(-98px,-9vh,-76px);bottom:0;
   width:min(440px,36vw);z-index:6;
   background:rgba(20,25,17,.78);backdrop-filter:blur(26px) saturate(150%);
   border:1px solid rgba(255,255,255,.09);
