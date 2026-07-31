@@ -541,27 +541,20 @@ tbody tr.sel .rank{color:var(--brand)}
 .vl .d{color:var(--ink2);font-size:14.5px;margin-top:11px;line-height:1.5}
 
 /* ── 5. стратегия ──────────────────────────────────── */
-/* Пауза перед стратегией: отдельный кадр для совместного прослушивания. */
-.listen-stage{min-height:calc(100vh - var(--hdr) - 76px);display:flex;flex-direction:column;
+/* Необязательная ссылка на онлайн-версию дашборда перед стратегией. */
+.share-stage{min-height:calc(100vh - var(--hdr) - 76px);display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;padding:24px 0 72px;
   border-bottom:1px solid rgba(255,255,255,.07);position:relative}
-.listen-kicker{color:var(--brand);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.12em}
-.listen-stage h2{max-width:900px;margin-top:13px;font-size:clamp(42px,4.2vw,68px);line-height:1}
-.listen-sub{max-width:680px;color:var(--ink3);font-size:clamp(16px,1.2vw,20px);line-height:1.5;margin-top:15px}
-.listen-qr{position:relative;width:clamp(230px,18vw,300px);aspect-ratio:1;margin-top:30px;
+.share-kicker{color:var(--brand);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.12em}
+.share-stage h2{max-width:920px;margin-top:13px;font-size:clamp(42px,4.2vw,68px);line-height:1}
+.share-sub{max-width:720px;color:var(--ink3);font-size:clamp(16px,1.2vw,20px);line-height:1.5;margin-top:15px}
+.share-qr{position:relative;width:clamp(230px,18vw,300px);aspect-ratio:1;margin-top:30px;
   padding:12px;background:#fff;border-radius:8px;box-shadow:0 24px 70px rgba(0,0,0,.45),0 0 34px rgba(102,212,22,.12)}
-.listen-qr::before{content:'';position:absolute;inset:-9px;border:1px solid rgba(134,235,61,.34);
+.share-qr::before{content:'';position:absolute;inset:-9px;border:1px solid rgba(134,235,61,.34);
   border-radius:8px;pointer-events:none}
-.listen-qr img{display:block;width:100%;height:100%;object-fit:contain}
-.listen-wave{height:22px;margin-top:25px;display:flex;align-items:center;justify-content:center;gap:5px}
-.listen-wave i{display:block;width:3px;height:8px;border-radius:2px;background:var(--brand);
-  animation:listenWave 1.15s ease-in-out infinite}
-.listen-wave i:nth-child(2),.listen-wave i:nth-child(5){animation-delay:-.25s}
-.listen-wave i:nth-child(3){animation-delay:-.5s}.listen-wave i:nth-child(4){animation-delay:-.72s}
-@keyframes listenWave{0%,100%{height:7px;opacity:.45}50%{height:21px;opacity:1}}
-.listen-flow{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:13px;color:var(--ink3);font-size:13px}
-.listen-flow b{color:var(--ink);font-size:12px;font-weight:700}
-.listen-flow i{width:42px;height:1px;background:rgba(255,255,255,.13)}
+.share-qr img{display:block;width:100%;height:100%;object-fit:contain}
+.share-note{display:flex;align-items:center;gap:9px;margin-top:25px;color:var(--ink3);font-size:13.5px}
+.share-note i{width:7px;height:7px;border-radius:50%;background:var(--brand);box-shadow:0 0 10px rgba(102,212,22,.7)}
 #s6>.strategy-head{margin-top:76px}
 
 /* ═══ Орбита целей: ученик в центре, восемь целей по кольцу ═══ */
@@ -720,8 +713,7 @@ body::after{content:'';position:fixed;left:0;right:0;bottom:0;height:84px;z-inde
   .annual-centerbar button{flex:0 0 178px;scroll-snap-align:start}
   .annual-panel{padding:20px 16px;gap:18px}
   .annual-summary .latest{font-size:52px}
-  .listen-stage{min-height:calc(100vh - var(--hdr));padding-bottom:50px}
-  .listen-flow{max-width:300px;gap:9px;flex-wrap:wrap}.listen-flow i{width:22px}
+  .share-stage{min-height:calc(100vh - var(--hdr));padding-bottom:50px}
 }
 </style>
 </head>
@@ -1130,13 +1122,11 @@ const T={
  s5:{kz:'Стратегиялық даму',ru:'Стратегическое развитие'},
  s5s:{kz:'Алдағы үш жылдағы көрсеткіштер — мақсатты басып, толығын көріңіз',
       ru:'Показатели на ближайшие три года — нажмите цель, чтобы раскрыть'},
- listenKicker:{kz:'Стратегия алдында',ru:'Перед стратегией'},
- listenT:{kz:'Алдымен тыңдап көріңіз',ru:'Сначала послушайте'},
- listenS:{kz:'Келесі қадамға өтпес бұрын осы ойды бірге тыңдайық',
-          ru:'Перед следующим шагом давайте вместе услышим эту мысль'},
- listenScan:{kz:'QR-кодты сканерлеңіз',ru:'Отсканируйте QR-код'},
- listenAudio:{kz:'Аудионы тыңдаңыз',ru:'Прослушайте аудио'},
- listenNext:{kz:'Содан кейін стратегияға өтеміз',ru:'Затем перейдём к стратегии'},
+ shareKicker:{kz:'Онлайн дашборд',ru:'Онлайн-дашборд'},
+ shareT:{kz:'Өзіңіз қарап көргіңіз келе ме?',ru:'Хотите посмотреть самостоятельно?'},
+ shareS:{kz:'Қызық болса, QR-кодты сканерлеп, осы дашбордты өз құрылғыңыздан аша аласыз',
+         ru:'Если интересно, отсканируйте QR-код и откройте этот дашборд на своём устройстве'},
+ shareNote:{kz:'Кез келген уақытта ашып көруге болады',ru:'Можно открыть в любое время'},
  orbHint:{kz:'Шеңбердегі мақсатты басыңыз — сипаттамасы осында шығады',
           ru:'Нажмите цель на кольце — её описание появится здесь'},
  qualTag:{kz:'сапалық мақсат',ru:'качественная цель'},
@@ -1662,13 +1652,12 @@ function orbTip(){
 }
 
 function secStrategy(){
- return `<section id="s6"><div class="listen-stage" id="strategy-listen">
-   <div class="listen-kicker">${t('listenKicker')}</div>
-   <h2>${t('listenT')}</h2>
-   <div class="listen-sub">${t('listenS')}</div>
-   <div class="listen-qr"><img src="assets/strategy-listen-qr.png" alt="QR"></div>
-   <div class="listen-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-   <div class="listen-flow"><b>01</b><span>${t('listenScan')}</span><i></i><b>02</b><span>${t('listenAudio')}</span><i></i><b>03</b><span>${t('listenNext')}</span></div>
+ return `<section id="s6"><div class="share-stage" id="dashboard-share">
+   <div class="share-kicker">${t('shareKicker')}</div>
+   <h2>${t('shareT')}</h2>
+   <div class="share-sub">${t('shareS')}</div>
+   <div class="share-qr"><img src="assets/dashboard-qr.png" alt="QR"></div>
+   <div class="share-note"><i></i>${t('shareNote')}</div>
   </div>
   <div class="sechead strategy-head">
    <div><h2>${t('s5')}</h2><div class="sub">${t('s5s')}</div></div>
@@ -1800,7 +1789,7 @@ const PRESENTATION_FRAMES=[
  {from:'#s5 .sechead',to:'#s5 .feats'},
  {from:'#s5 .blockhead:nth-of-type(3)',to:'#s5 .vals'},
  {from:'#s5 .blockhead:nth-of-type(5)',to:'#s5 .syn'},
- {from:'#strategy-listen',to:'#strategy-listen'},
+ {from:'#dashboard-share',to:'#dashboard-share'},
  {from:'#s6 .strategy-head',to:'#s6 .orbwrap'},
  {bottom:true,from:'#s6 .orbwrap',to:'#s6 footer'}
 ];
