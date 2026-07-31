@@ -1281,12 +1281,7 @@ function secSchools(){
    <div class="card"><h3>${t('staffl')}</h3>
      ${stR?stR.map(([n,v])=>`<div class="mb"><div class="t">${n}</div>
        <div class="tr"><div class="fl" data-w="${v/mx*100}"></div></div><div class="n num">${v}</div></div>`).join('')
-      :`<div class="hz soon">${t('nostaff')}</div>`}
-     ${(()=>{const cl=CLUBS.filter(c=>c.s===s.id);
-       return `<h3 style="margin-top:22px">${t('clubs')}</h3>${cl.length
-         ? `<ul class="ach">${cl.map(c=>`<li>${c.name}${
-             c.area?` · <span style="color:var(--ink3)">${c.area}</span>`:''}</li>`).join('')}</ul>`
-         : `<div class="hz soon">${t('nodata')}</div>`}`})()}</div>
+      :`<div class="hz soon">${t('nostaff')}</div>`}</div>
  </div></section>`;
 }
 
