@@ -223,10 +223,10 @@ h2{font-size:clamp(36px,3.3vw,54px);font-weight:600;letter-spacing:-.032em;line-
 .cp-agg{display:flex;gap:28px;margin-top:15px;padding-bottom:15px;border-bottom:1px solid rgba(255,255,255,.06)}
 .cp-agg div{font-size:13px;color:var(--ink3)}
 .cp-agg b{display:block;font-size:25px;color:var(--ink);font-weight:700;margin-top:2px;letter-spacing:-.01em}
-.cp-list{display:grid;grid-template-rows:repeat(var(--city-schools),minmax(0,1fr));
+.cp-list{display:flex;flex-direction:column;align-items:stretch;
   gap:9px;margin-top:13px;flex:1;min-height:0}
 .cp-s{background:var(--s2);border-radius:var(--r2);padding:8px 15px;cursor:pointer;transition:.18s;
-  min-height:0;display:flex;flex-direction:column;justify-content:center}
+  min-height:clamp(116px,16vh,154px);flex:0 0 auto;display:flex;flex-direction:column;justify-content:center}
 .cp-s:hover{background:var(--s3)}
 .cp-s .n{display:flex;align-items:center;gap:10px;font-size:16.5px;font-weight:600}
 .cp-s .r{display:flex;gap:16px;margin-top:8px;color:var(--ink3);font-size:13.5px;flex-wrap:wrap}
