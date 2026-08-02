@@ -1864,7 +1864,6 @@ function secResults(){
     <div class="untc"><div class="v num">13</div><div class="l">${t('top')}</div></div>
   </div>
  </div>
- ${annualBlock()}
  ${winsBlock()}
  <div class="blockhead" id="growth-heading">
    <div><h3>${t('growth')}</h3><div class="sub">${t('growths')}</div></div></div>
@@ -1930,6 +1929,7 @@ function secStaff(){
    <span class="tick"><svg viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg></span>
    <div>${m.n!=null?`<div class="n num big-n">${m.n}</div>`:''}<div class="d">${m[lang]}</div></div>
   </div>`).join('')}</div>
+  ${annualBlock()}
   <div class="blockhead" id="synergy-heading"><div><h3>${t('synT')}</h3><div class="sub">${t('synS')}</div></div></div>
   <div class="syn" id="synergy-body">${SYNERGY.map(s=>`<div class="mk">${tick}<div class="d">${s[lang]}</div></div>`).join('')}</div>
  </section>`;
@@ -2232,10 +2232,10 @@ const PRESENTATION_FRAMES=[
  {from:'#s3 .sechead',to:'#s3 .vals'},
  {from:'#s4 .sechead',to:'#s4 .feats'},
  {from:'#s5 .sechead',to:'#s5 .gr'},
- {from:'#annual-results',to:'#annual-results', step:'annual'},
  {from:'#wins-heading',to:'#wins-body', step:'win'},
  {from:'#growth-heading',to:'#growth-body'},
  {from:'#s6 .sechead',to:'#s6 .marks'},
+ {from:'#annual-results',to:'#annual-results', step:'annual'},
  {from:'#synergy-heading',to:'#synergy-body'},
  {from:'#dashboard-share',to:'#dashboard-share'},
  {from:'#s7 .strategy-head',to:'#s7 .orbwrap', step:'goal'},
