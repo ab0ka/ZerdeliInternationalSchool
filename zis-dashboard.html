@@ -6,34 +6,52 @@
 <title>ZIS — Мектептер желісі</title>
 <style>
 :root{
-  --bg:#080A07; --s1:#121610; --s2:#1B2018; --s3:#252C21;
+  /* База поднята с почти чёрного: на проекторе прежний #080A07 читался как
+     душная дыра, а поверхности с ним почти сливались. Ступени между bg и s1–s3
+     сохранены, поэтому плашки по-прежнему отделяются от фона. */
+  --bg:#0F150E; --s1:#1B231A; --s2:#26301F; --s3:#323E2A;
   --brand:#66D416; --brand-hi:#86EB3D; --brand-dim:#52A911; --warm:#BE8760;
   --gold:#E0B252;   /* только для международных побед — это медаль, а не оформление */
-  --ink:#fff; --ink2:#C6CFC0; --ink3:#8B9584; --ink4:#5A6355;
+  --ink:#fff; --ink2:#CBD4C5; --ink3:#94A08C; --ink4:#6C7766;
   --c0:#52A911; --c1:#3987e5; --c2:#d95926; --c3:#199e70;
   --c4:#c98500; --c5:#d55181; --c6:#9085e9; --c7:#e66767;
   --r:22px; --r2:14px; --hdr:72px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{
-  scroll-behavior:smooth;background:var(--bg);scrollbar-gutter:stable;
-  scrollbar-width:thin;scrollbar-color:#416f2c #090c08;
+  scroll-behavior:smooth;scrollbar-gutter:stable;
+  /* Точечная сетка по всей странице: пустые поля по краям перестают быть
+     плоской заливкой и читаются как поверхность. Держим её на html, а цветные
+     пятна — на body, поэтому фон body ниже полупрозрачный. */
+  background-color:var(--bg);
+  background-image:radial-gradient(circle,rgba(203,212,197,.055) 1px,transparent 1.5px);
+  background-size:48px 48px;
+  background-attachment:fixed;
+  scrollbar-width:thin;scrollbar-color:#4d7d36 #151B13;
 }
 html::-webkit-scrollbar{width:10px}
-html::-webkit-scrollbar-track{background:#090c08}
+html::-webkit-scrollbar-track{background:#151B13}
 html::-webkit-scrollbar-thumb{
-  min-height:64px;border:2px solid #090c08;border-radius:999px;
+  min-height:64px;border:2px solid #151B13;border-radius:999px;
   background:linear-gradient(180deg,#4f842f,#315522);
 }
 html::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,var(--brand-hi),var(--brand-dim))}
 html::-webkit-scrollbar-button{display:none;width:0;height:0}
-html::-webkit-scrollbar-corner{background:#090c08}
+html::-webkit-scrollbar-corner{background:#151B13}
 body{
   color:var(--ink);
-  /* фон не плоский: мягкий свет сверху и лёгкий градиент в глубину */
+  /* Свет по бокам растаскивал взгляд к рамке — подсвечивал раму вместо
+     содержимого. Теперь наоборот: один мягкий источник по центру, а края
+     уходят в темноту виньеткой. Виньетка лежит первым слоем, то есть поверх
+     остальных, и гасит подсветку и точечную сетку ровно у краёв экрана.
+     Привязка fixed — чтобы кадрировался каждый экран, а не страница целиком.
+     Все слои полупрозрачные, чтобы сетка с html просвечивала в центре. */
   background:
-    radial-gradient(1400px 680px at 50% -8%, rgba(102,212,22,.06), transparent 68%),
-    linear-gradient(180deg,#0B0E0A 0%,#070907 55%,#060806 100%);
+    radial-gradient(ellipse 88% 82% at 50% 42%, rgba(0,0,0,0) 48%, rgba(6,10,6,.46) 100%),
+    radial-gradient(1250px 860px at 50% 24%, rgba(102,212,22,.16), transparent 66%),
+    radial-gradient(920px 640px at 50% 46%, rgba(224,178,82,.055), transparent 64%),
+    radial-gradient(1050px 780px at 50% 96%, rgba(190,135,96,.085), transparent 62%),
+    linear-gradient(180deg,rgba(22,30,20,.34) 0%,rgba(14,19,13,.08) 46%,rgba(11,16,11,.32) 100%);
   background-attachment:fixed;
   font-family:'Segoe UI Variable Display','Segoe UI',system-ui,-apple-system,'Noto Sans',sans-serif;
   font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;
@@ -96,7 +114,32 @@ nav a.on{color:var(--brand);background:rgba(102,212,22,.11);font-weight:600}
 .link.ok{color:var(--brand)} .link.ok i{background:var(--brand);box-shadow:0 0 9px var(--brand)}
 .link.off{color:var(--ink4)} .link.off i{background:var(--ink4)}
 .link.wait{color:var(--ink3)} .link.wait i{background:var(--brand);animation:sheetPulse 1.1s ease-in-out infinite}
-.sheet-gate{display:none;position:fixed;inset:88px 0 0;z-index:45;background:rgba(5,12,7,.97);
+.link.local{color:var(--warm)} .link.local i{background:var(--warm)}
+/* выбор режима данных: онлайн из таблицы или офлайн на текущих цифрах */
+.linkwrap{position:relative;flex-shrink:0}
+.srcmenu{position:absolute;top:calc(100% + 10px);right:0;z-index:60;width:274px;display:none;
+  background:var(--s1);border:1px solid rgba(255,255,255,.1);border-radius:var(--r2);
+  padding:7px;box-shadow:0 20px 48px rgba(0,0,0,.6)}
+.srcmenu.open{display:block}
+.srcmenu h6{margin:0;padding:8px 10px 6px;font-size:10.5px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink4)}
+.srcopt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;font:inherit;
+  background:none;border:0;cursor:pointer;color:var(--ink2);padding:9px 10px;border-radius:10px;transition:.15s}
+.srcopt:hover{background:var(--s2)}
+.srcopt.on{color:var(--ink)}
+.srcopt i{box-sizing:border-box;width:15px;height:15px;border-radius:50%;flex-shrink:0;margin-top:2px;
+  border:2px solid var(--s3);position:relative}
+.srcopt.on i{border-color:var(--brand)}
+.srcopt.on i::after{content:'';position:absolute;inset:2px;border-radius:50%;background:var(--brand)}
+.srcopt b{display:block;font-size:13px;font-weight:600}
+.srcopt s{display:block;text-decoration:none;font-size:11.5px;color:var(--ink4);margin-top:3px;line-height:1.35}
+.srcsep{height:1px;background:rgba(255,255,255,.07);margin:6px 8px}
+.srcrefresh{display:flex;align-items:center;gap:9px;width:100%;font:inherit;font-size:12.5px;
+  background:none;border:0;cursor:pointer;color:var(--ink3);padding:9px 10px;border-radius:10px;transition:.15s}
+.srcrefresh:hover{background:var(--s2);color:var(--brand)}
+.srcrefresh:disabled{opacity:.4;cursor:default}
+.srcrefresh svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round}
+.sheet-gate{display:none;position:fixed;inset:88px 0 0;z-index:45;background:rgba(15,21,14,.97);
   align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:32px}
 body.sheet-waiting .sheet-gate{display:flex}
 .sheet-gate .spin{width:28px;height:28px;border:3px solid var(--s3);border-top-color:var(--brand);
@@ -116,15 +159,33 @@ section{padding-top:76px;scroll-margin-top:var(--hdr);
   opacity:0;transform:translateY(22px);
   transition:opacity .75s cubic-bezier(.22,.85,.28,1),transform .75s cubic-bezier(.22,.85,.28,1)}
 section.in{opacity:1;transform:none}
+/* Раздел въезжал одним куском — экран менялся как слайд, внутри ничего не жило.
+   Теперь содержимое собирается каскадом: заголовок, затем блоки один за другим.
+   Класс снимается после проигрыша, иначе каскад повторялся бы на каждый
+   перерендер — при смене языка и клике по фильтру это сводило бы с ума. */
+section.cascade> *{opacity:0;transform:translateY(20px)}
+section.cascade.in> *{opacity:1;transform:none;
+  transition:opacity .62s cubic-bezier(.22,.85,.28,1) calc(var(--i,0)*78ms),
+             transform .62s cubic-bezier(.22,.85,.28,1) calc(var(--i,0)*78ms)}
+/* Затемнение сцены. Гасить соседние блоки одной прозрачностью было мало:
+   крупный заголовок соседнего раздела всё равно перетягивал взгляд. Теперь
+   поверх всей страницы ложится тёмный слой, а текущий кадр поднимается над
+   ним по z-index — получается прожектор, а не приглушение. Слой не ловит
+   клики и живёт вне main, поэтому перерисовка разделов его не трогает. */
+.stagedim{position:fixed;inset:0;z-index:30;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse 76% 68% at 50% 50%,rgba(6,10,6,.5),rgba(4,8,4,.74) 80%);
+  transition:opacity .5s ease}
+body.presentation-mode .stagedim{opacity:1}
 body.presentation-mode section> *{
   transform-origin:center;
   transition:opacity .48s ease,filter .48s ease,transform .58s cubic-bezier(.22,.8,.28,1);
 }
 body.presentation-mode section> :not(.presentation-focus){
-  opacity:.3;filter:saturate(.52);transform:scale(.992);
+  opacity:.34;filter:saturate(.55);transform:scale(.99);
 }
 body.presentation-mode section> .presentation-focus{
   opacity:1;filter:none;transform:none;
+  position:relative;z-index:31;
 }
 .sechead{display:flex;align-items:flex-end;justify-content:space-between;gap:56px;margin-bottom:26px;flex-wrap:wrap}
 /* крупнее и легче: на больших кеглях жирность мешает, работает размер */
@@ -147,12 +208,21 @@ h2{font-size:clamp(36px,3.3vw,54px);font-weight:600;letter-spacing:-.032em;line-
 #s1{height:calc(100vh - var(--hdr));display:flex;flex-direction:column;
   padding:24px 0 30px;overflow:hidden;position:relative}
 .heroTop{display:flex;align-items:flex-start;justify-content:space-between;gap:40px;flex-shrink:0}
-.heroTl{margin-top:16px;color:var(--ink4);font-size:14.5px;line-height:1.6}
+.heroTl{margin-top:16px;color:var(--ink4);font-size:14.5px;line-height:1.6;cursor:pointer;
+  transition:color .2s}
+.heroTl:hover{color:var(--ink3)}
 .heroTl b{color:var(--brand);font-weight:700;margin-right:5px}
 .heroTl s{text-decoration:none;color:var(--ink3);margin-right:16px}
 .heroMap{flex:1;min-height:0;position:relative;margin:6px 0}
+/* свечение под картой медленно дышит: чёрное поле вокруг перестаёт быть мёртвым,
+   при этом за 26 секунд цикла движение не читается как анимация */
 .heroMap::before{content:'';position:absolute;inset:-6% -10%;pointer-events:none;
-  background:radial-gradient(ellipse 52% 56% at 56% 48%,rgba(102,212,22,.16),transparent 72%)}
+  background:radial-gradient(ellipse 52% 56% at 56% 48%,rgba(102,212,22,.16),transparent 72%);
+  will-change:transform;animation:heroBreath 26s ease-in-out infinite}
+@keyframes heroBreath{
+  0%,100%{transform:scale(1) translate3d(0,0,0);opacity:.86}
+  50%{transform:scale(1.11) translate3d(2%,-1.6%,0);opacity:1}
+}
 #map{width:100%;height:100%;display:block;position:relative}
 .heroStats{display:grid;grid-template-columns:repeat(4,1fr);flex-shrink:0;
   border-top:1px solid rgba(255,255,255,.09);padding-top:24px}
@@ -177,17 +247,19 @@ h2{font-size:clamp(36px,3.3vw,54px);font-weight:600;letter-spacing:-.032em;line-
    шапка, заголовок, фильтр лет, отступы карточки и хронология.
    Так раздел заполняет экран ровно, и следующий заголовок снизу не выглядывает. */
 #map{width:100%;display:block;margin-top:4px;height:clamp(250px,calc(100vh - 434px),660px)}
-#kz{fill:#131813;stroke:rgba(102,212,22,.22);stroke-width:1.1}
+#kz{fill:#1D2819;stroke:rgba(102,212,22,.32);stroke-width:1.1}
 .cityg{transition:opacity .55s}
 /* тёмная обводка под подписью — чтобы читалась поверх свечения и контура */
 .clabel{font-family:'Segoe UI',system-ui,sans-serif;font-size:20px;font-weight:600;
-  paint-order:stroke;stroke:#080A07;stroke-width:5px;stroke-linejoin:round}
+  paint-order:stroke;stroke:#0F150E;stroke-width:5px;stroke-linejoin:round}
 
 .heroTop .years{justify-content:flex-end;max-width:min(560px,42vw);flex-shrink:0}
 .cityhit{cursor:pointer}
 .cityhit:not(.act):hover .cdot{r:10}
+/* задержка пульса живёт в переменной, а не в инлайновом animation-delay:
+   инлайн перебивал бы задержку появления города и точки вспыхивали бы вразнобой */
 .cdot{transition:r .18s;transform-box:fill-box;transform-origin:center;
-  animation:cityPulse 2.8s ease-in-out infinite}
+  animation:cityPulse 2.8s ease-in-out var(--pd,0s) infinite}
 .city-ripple{fill:none;stroke:var(--brand-hi);stroke-width:1.7;vector-effect:non-scaling-stroke;
   transform-box:fill-box;transform-origin:center;pointer-events:none;opacity:0;
   animation:cityRipple 3.6s cubic-bezier(.22,.62,.36,1) infinite}
@@ -201,6 +273,18 @@ h2{font-size:clamp(36px,3.3vw,54px);font-weight:600;letter-spacing:-.032em;line-
   0%{transform:scale(.7);opacity:0}
   12%{opacity:.46}
   76%,100%{transform:scale(3.35);opacity:0}
+}
+/* Сеть не появляется готовой — она вырастает на глазах, город за городом
+   в порядке открытия. Это первое, что видит зал, и это единственная
+   анимация здесь, которая рассказывает факт, а не украшает. */
+.cityg.arrive{animation:cityArrive .6s ease-out var(--d,0s) both}
+.cityg.arrive .cdot{animation:cityPop .6s cubic-bezier(.22,.9,.32,1) var(--d,0s) both}
+.cityg.arrive .city-ripple{opacity:0;animation:none}
+@keyframes cityArrive{from{opacity:0}to{opacity:1}}
+@keyframes cityPop{
+  0%{transform:scale(.15);opacity:0;filter:drop-shadow(0 0 0 rgba(134,235,61,0))}
+  55%{transform:scale(1.32);opacity:1;filter:drop-shadow(0 0 16px rgba(134,235,61,1))}
+  100%{transform:scale(1);opacity:1;filter:drop-shadow(0 0 6px rgba(134,235,61,.7))}
 }
 .clabel{transition:font-size .2s}
 
@@ -223,8 +307,21 @@ h2{font-size:clamp(36px,3.3vw,54px);font-weight:600;letter-spacing:-.032em;line-
 .cp-agg{display:flex;gap:28px;margin-top:15px;padding-bottom:15px;border-bottom:1px solid rgba(255,255,255,.06)}
 .cp-agg div{font-size:13px;color:var(--ink3)}
 .cp-agg b{display:block;font-size:25px;color:var(--ink);font-weight:700;margin-top:2px;letter-spacing:-.01em}
+/* В городах с двумя школами вторая карточка обрезалась панелью. Список
+   прокручивается: полоса тонкая и полупрозрачная — увидеть можно, но она
+   не спорит с содержимым. Затухание у нижней кромки подсказывает, что
+   список продолжается; при одной школе оно приходится на пустое место
+   под карточкой и потому незаметно. */
 .cp-list{display:flex;flex-direction:column;align-items:stretch;
-  gap:9px;margin-top:13px;flex:1;min-height:0}
+  gap:9px;margin-top:13px;flex:1;min-height:0;
+  overflow-y:auto;overscroll-behavior:contain;padding-right:7px;margin-right:-9px;
+  scrollbar-width:thin;scrollbar-color:rgba(134,235,61,.3) transparent;
+  -webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 26px),transparent);
+  mask-image:linear-gradient(180deg,#000 calc(100% - 26px),transparent)}
+.cp-list::-webkit-scrollbar{width:6px}
+.cp-list::-webkit-scrollbar-track{background:transparent}
+.cp-list::-webkit-scrollbar-thumb{background:rgba(134,235,61,.26);border-radius:999px}
+.cp-list:hover::-webkit-scrollbar-thumb{background:rgba(134,235,61,.5)}
 .cp-s{background:var(--s2);border-radius:var(--r2);padding:8px 15px;cursor:pointer;transition:.18s;
   min-height:clamp(116px,16vh,154px);flex:0 0 auto;display:flex;flex-direction:column;justify-content:center}
 .cp-s:hover{background:var(--s3)}
@@ -555,7 +652,8 @@ tbody tr.sel .rank{color:var(--brand)}
 .share-qr img{display:block;width:100%;height:100%;object-fit:contain}
 .share-note{display:flex;align-items:center;gap:9px;margin-top:25px;color:var(--ink3);font-size:13.5px}
 .share-note i{width:7px;height:7px;border-radius:50%;background:var(--brand);box-shadow:0 0 10px rgba(102,212,22,.7)}
-#s6>.strategy-head{margin-top:76px}
+#s7>.strategy-head{margin-top:76px}
+.support-section .vals{margin-top:0}
 
 /* ═══ Орбита целей: ученик в центре, восемь целей по кольцу ═══ */
 /* Орбита во всю ширину. Кольца эллиптические — круг на широком поле
@@ -569,17 +667,16 @@ tbody tr.sel .rank{color:var(--brand)}
 .orbstage{position:relative}
 .orbit-mobile{display:none}
 #orb{width:100%;height:auto;display:block;position:relative}
+/* пунктир бежит вдоль пути, а путь задан по часовой — никакого reverse:
+   раньше среднее кольцо шло навстречу внешнему, а внутреннее стояло */
 @keyframes orbflow{to{stroke-dashoffset:-260}}
 .orb-r{animation:orbflow 14s linear infinite}
-.orb-r2{animation:orbflow 22s linear infinite reverse}
 
-/* по орбитам летят частицы — без них кольца выглядят статичной разметкой */
+/* по орбитам летят частицы — без них кольца выглядят статичной разметкой.
+   Путь каждой подставляется из той же геометрии, что и у её кольца. */
 @keyframes orbmove{to{offset-distance:100%}}
 .odot{offset-rotate:0deg;animation:orbmove 26s linear infinite;
   filter:drop-shadow(0 0 7px rgba(134,235,61,.95))}
-.odot.p1{offset-path:path("M128 358a672 272 0 1 0 1344 0a672 272 0 1 0 -1344 0")}
-.odot.p2{offset-path:path("M308 358a492 199 0 1 0 984 0a492 199 0 1 0 -984 0");animation-duration:19s}
-.odot.p3{offset-path:path("M488 358a312 126 0 1 0 624 0a312 126 0 1 0 -624 0");animation-duration:33s}
 
 /* центр горит как звезда */
 @keyframes starpulse{
@@ -620,6 +717,16 @@ tbody tr.sel .rank{color:var(--brand)}
 .onode.on .disc{fill:rgba(102,212,22,.17);stroke:var(--brand);stroke-width:2}
 .onode .oic{stroke:var(--ink3);stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:.2s}
 .onode:hover .oic,.onode.on .oic{stroke:var(--brand)}
+/* кольцо прогресса вокруг узла: серый ободок — путь целиком, зелёная дуга —
+   пройденная часть; у качественных целей вместо дуги пунктир */
+.onode .oring-t{fill:none;stroke:rgba(255,255,255,.1);stroke-width:3}
+.onode .oring{fill:none;stroke:var(--brand);stroke-width:3;stroke-linecap:round;
+  transition:stroke-dashoffset 1.2s cubic-bezier(.2,.85,.28,1)}
+.onode .oring-q{fill:none;stroke:rgba(255,255,255,.11);stroke-width:2;stroke-dasharray:3 8}
+.onode:hover .oring,.onode.on .oring{stroke:var(--brand-hi)}
+.onode .osub{fill:var(--ink4);font-size:14px;text-anchor:middle;transition:.2s;
+  font-family:'Segoe UI',system-ui,sans-serif}
+.onode:hover .osub,.onode.on .osub{fill:var(--ink2)}
 .onode .olb{fill:var(--ink3);font-size:13px;font-weight:600;text-anchor:middle;transition:.2s;
   font-family:'Segoe UI',system-ui,sans-serif}
 .onode:hover .olb,.onode.on .olb{fill:#fff}
@@ -680,6 +787,8 @@ footer b{color:var(--ink3);font-weight:600}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   section{opacity:1;transform:none}
+  section.cascade> *{opacity:1;transform:none}
+  .cityg.arrive,.cityg.arrive .cdot{animation:none;opacity:1}
   *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
 }
 
@@ -770,7 +879,10 @@ body::after{content:'';position:fixed;left:0;right:0;bottom:0;height:84px;z-inde
   .cp-meta{font-size:13px}
   .cp-agg{gap:34px;margin-top:13px;padding-bottom:13px}
   .cp-agg b{font-size:23px}
-  .cp-list{gap:8px;margin-top:12px}
+  /* на узком экране панель встроена в поток и растёт вниз — прокрутка
+     внутри списка тут только мешала бы, гасим её вместе с затуханием */
+  .cp-list{gap:8px;margin-top:12px;overflow:visible;padding-right:0;margin-right:0;
+    -webkit-mask-image:none;mask-image:none}
   .cp-s{min-height:0;padding:13px 14px}
   .cp-s .n{font-size:15px}
   .cp-s .r{gap:7px 13px;font-size:12.5px}
@@ -873,7 +985,7 @@ body::after{content:'';position:fixed;left:0;right:0;bottom:0;height:84px;z-inde
   .share-sub{font-size:14.5px}
   .share-qr{width:210px;margin-top:25px}
   .share-note{font-size:12.5px;text-align:left}
-  #s6>.strategy-head{margin-top:52px}
+  #s7>.strategy-head{margin-top:52px}
   .orbstage{display:none}
   .orbwrap{padding:0;background:transparent;box-shadow:none;overflow:visible}
   .orbwrap::before{display:none}
@@ -911,7 +1023,10 @@ body::after{content:'';position:fixed;left:0;right:0;bottom:0;height:84px;z-inde
     <button class="on" onclick="setLang('kz')">ҚАЗ</button>
     <button onclick="setLang('ru')">РУС</button>
   </div>
-  <div class="link off" id="link"><i></i><span></span></div>
+  <div class="linkwrap">
+    <div class="link off" id="link" role="button" tabindex="0"><i></i><span></span></div>
+    <div class="srcmenu" id="srcmenu"></div>
+  </div>
   <button class="fs" id="fsbtn" onclick="toggleFS()"><svg viewBox="0 0 24 24"></svg></button>
 </header>
 
@@ -920,6 +1035,7 @@ body::after{content:'';position:fixed;left:0;right:0;bottom:0;height:84px;z-inde
   <b id="sheetgate-title"></b>
   <small id="sheetgate-error"></small>
 </div>
+<div class="stagedim" aria-hidden="true"></div>
 <main id="main"></main>
 
 <script>
@@ -988,6 +1104,16 @@ function derive(){
  LADDER[0].n=sum('ped'); LADDER[1].n=sum('mod'); LADDER[2].n=sum('exp');
  LADDER[3].n=sum('res'); LADDER[4].n=sum('mst');
  AGG.hicat=sum('mst')+sum('res')+sum('exp')+sum('mod');
+ /* Цель, которая повторяет общий показатель, берёт «сейчас» из него самого.
+    Раньше это число жило в «Стратегии» отдельной колонкой и разъезжалось
+    с первым экраном: там стояли 294 педагога и 2500 учеников против 264
+    и 2428, посчитанных по школам. Теперь колонка — не источник, а ручная
+    поправка: она работает, только если ячейку заполнили, а пустая ячейка
+    означает «считай сам». Незаполненные ячейки — обычное состояние. */
+ [...GOALS,...ORBIT].forEach(g=>{
+  const live=g.agg?AGG[g.agg]:null;
+  g.now=g.nowOverride??(live!=null?live:g.now);
+ });
 }
 
 const LADDER=[{kz:'Педагог',ru:'Педагог',n:125,c:4},{kz:'Модератор',ru:'Модератор',n:48,c:6},
@@ -1011,6 +1137,14 @@ let sheetConnecting = false;
 let sheetLastAttempt = 0;
 let sheetRetryTimer = 0;
 const SHEET_CACHE_KEY=`zis-sheet:${SHEET.id}:v4`;
+
+/* Режим данных выбирает ведущий, а не браузер. «Офлайн» — это не авария,
+   а осознанный выбор перед выходом в зал: сеть не трогаем совсем, на экране
+   замирают те цифры, что уже загружены. Выбор переживает перезагрузку файла,
+   иначе его пришлось бы делать заново на чужом ноутбуке за минуту до начала. */
+const SHEET_MODE_KEY='zis-mode:v1';
+let sheetMode=(()=>{try{return localStorage.getItem(SHEET_MODE_KEY)==='offline'?'offline':'online'}catch(_){return 'online'}})();
+const offlineMode=()=>sheetMode==='offline';
 
 /* Какие именно годы сравниваются. В источниках период назван только словами —
    «соңғы екі жылдағы», конкретные учебные годы нигде не проставлены.
@@ -1132,9 +1266,9 @@ const FEATURES=[
       «8000 ата-ана» и «1000 ұстаз» на слайде стоят без пояснений —
       трактую как трёхлетние цели по родителям и педагогам. ── */
 const GOALS=[
- {now:8,  tgt:20,  kz:'мектеп',ru:'школ'},
- {now:6,  tgt:15,  kz:'қала',ru:'городов'},
- {now:294,tgt:1000,kz:'педагог',ru:'педагогов'},
+ {agg:'schools', now:8,  tgt:20,  kz:'мектеп',ru:'школ'},
+ {agg:'cities',  now:6,  tgt:15,  kz:'қала',ru:'городов'},
+ {agg:'teachers',now:294,tgt:1000,kz:'педагог',ru:'педагогов'},
  {now:0,  tgt:3,   kz:'IB стандартындағы мектеп',ru:'школы со стандартом IB'},
 ];
 /* Орбитальная схема со слайда 11: ученик в центре, восемь целей по кольцу.
@@ -1150,11 +1284,11 @@ const OIC={
  cup:'<path d="M8.5 20.5h7M12 17.2v3.3M6.8 4h10.4v5.2a5.2 5.2 0 0 1-10.4 0V4Z"/><path d="M6.8 6H5a2.1 2.1 0 0 0 0 4.2h1.8M17.2 6H19a2.1 2.1 0 0 1 0 4.2h-1.8"/>',
 };
 const ORBIT=[
- {ic:'school',now:8,  tgt:20,  sk:'20 мектеп',sr:'20 школ',
+ {ic:'school',agg:'schools', now:8,  tgt:20,  sk:'20 мектеп',sr:'20 школ',
   kz:'15-тен астам қалада кемінде 20 мектеп қалыптастыру',ru:'Не менее 20 школ более чем в 15 городах'},
- {ic:'people',now:294,tgt:1000,sk:'1000 ұстаз',sr:'1000 педагогов',
+ {ic:'people',agg:'teachers',now:294,tgt:1000,sk:'1000 ұстаз',sr:'1000 педагогов',
   kz:'1000-нан астам мұғалімдер командасы',ru:'Команда более чем из 1000 педагогов'},
- {ic:'grad',  now:2500,tgt:8000,sk:'8000 оқушы',sr:'8000 учеников',
+ {ic:'grad',  agg:'students',now:2500,tgt:8000,sk:'8000 оқушы',sr:'8000 учеников',
   kz:'8000-ға жуық оқушы желіде білім алады',ru:'Около 8000 учеников в сети'},
  {ic:'globe', now:0,  tgt:3,   sk:'3 IB',sr:'3 IB',
   kz:'Кемінде 3 мектеп IB халықаралық стандартына ие болады',ru:'Не менее 3 школ со стандартом IB'},
@@ -1212,8 +1346,9 @@ const TL=[{y:2022,kz:'Астана, Шымкент',ru:'Астана, Шымке
 
 const T={
  brandsub:{kz:'Мектептер желісі',ru:'Сеть школ'},
- nav:[{kz:'Желі',ru:'Сеть'},{kz:'Мектептер',ru:'Школы'},{kz:'Нәтижелер',ru:'Результаты'},
-      {kz:'Ұстаздар',ru:'Педагоги'},{kz:'Ерекшеліктер',ru:'Особенности'},{kz:'Стратегия',ru:'Стратегия'}],
+ nav:[{kz:'Желі',ru:'Сеть'},{kz:'Мектептер',ru:'Школы'},{kz:'Төрт тірек',ru:'Четыре опоры'},
+      {kz:'Ерекшеліктер',ru:'Особенности'},{kz:'Нәтижелер',ru:'Результаты'},
+      {kz:'Құрам',ru:'Состав'},{kz:'Стратегия',ru:'Стратегия'}],
  grantsBlock:{kz:'Гранттар және ҰБТ',ru:'Гранты и ЕНТ'},
  funnel:{kz:'түлек грантқа түсті',ru:'выпускников поступили на грант'},
  byPlace:{kz:'Орындар бойынша',ru:'По местам'},
@@ -1250,6 +1385,7 @@ const T={
  cpStu:{kz:'оқушы',ru:'учеников'},cpTch:{kz:'педагог',ru:'педагогов'},
  cpCap:{kz:'сыйымдылық',ru:'вместимость'},cpRsv:{kz:'резервте',ru:'в резерве'},
  cpGr:{kz:'ҰБТ гранты',ru:'грант ҰБТ'},cpNishGr:{kz:'НИШ гранты',ru:'грант НИШ'},
+ nishKids:{kz:'бала',ru:'детей'},
  cpMore:{kz:'Мектепті ашу үшін басыңыз',ru:'Нажмите, чтобы открыть школу'},
  s2:{kz:'Мектептер',ru:'Школы'},
  s2s:{kz:'Бағанды басып сұрыптаңыз, жолды басып мектепті ашыңыз',ru:'Нажмите заголовок для сортировки, строку — чтобы открыть школу'},
@@ -1266,6 +1402,15 @@ const T={
  linkOn:{kz:'кестеден',ru:'из таблицы'},
  linkWait:{kz:'қосылуда',ru:'подключение'},
  linkOff:{kz:'ішкі дерек',ru:'встроенные данные'},
+ linkLocal:{kz:'офлайн',ru:'офлайн'},
+ replay:{kz:'Желінің өсуін қайта көрсету',ru:'Показать рост сети заново'},
+ srcTitle:{kz:'Дерек көзі',ru:'Источник данных'},
+ srcOnline:{kz:'Онлайн дерек',ru:'Онлайн-данные'},
+ srcOnlineHint:{kz:'Google Sheets кестесінен жаңарып тұрады',ru:'обновляются из таблицы Google Sheets'},
+ srcOffline:{kz:'Офлайн',ru:'Офлайн'},
+ srcOfflineHint:{kz:'интернетсіз, ағымдағы цифрлармен',ru:'без интернета, на текущих цифрах'},
+ srcRefresh:{kz:'Қазір жаңарту',ru:'Обновить сейчас'},
+ srcNoNet:{kz:'желі жоқ',ru:'сети нет'},
  sheetWait:{kz:'Google Sheets деректері жүктелуде',ru:'Загружаем данные Google Sheets'},
  s3:{kz:'Нәтижелер',ru:'Результаты'},
  s3s:{kz:'Мемлекеттік грантқа түсу және олимпиадалық өсу',ru:'Поступление на государственный грант и олимпиадный рост'},
@@ -1312,6 +1457,7 @@ const T={
  orbHint:{kz:'Шеңбердегі мақсатты басыңыз — сипаттамасы осында шығады',
           ru:'Нажмите цель на кольце — её описание появится здесь'},
  qualTag:{kz:'сапалық мақсат',ru:'качественная цель'},
+ orbNow:{kz:'қазір',ru:'сейчас'},
  g:[{kz:'мектеп',ru:'школ'},{kz:'қала',ru:'городов'},{kz:'IB стандартындағы мектеп',ru:'школы со стандартом IB'}],
  hz:[{kz:'1 жыл',ru:'1 год'},{kz:'3 жыл',ru:'3 года'},{kz:'5 жыл',ru:'5 лет'}],
  soon:{kz:'Бұл көкжиек жиналыста талқыланады — дереккөздерде жоспар жоқ.',
@@ -1346,6 +1492,9 @@ const KZPATH="M597.8 482.8L595.7 484.3L593.3 484.8L592.1 485.7L590.8 487.9L589.6
 function mapSvg(){
  const vis=c=>yr===null||c.year<=yr;
  const nSchools=id=>SCHOOLS.filter(s=>CITY_OF[s.id]===id).length;
+ /* порядок появления — хронологический, а не порядок в массиве:
+    зал должен увидеть именно последовательность открытия школ */
+ const order=[...CITIES].sort((a,b)=>(a.year||0)-(b.year||0)).map(c=>c.id);
  return `<svg id="map" viewBox="-14 -14 1028 571">
   <path id="kz" d="${KZPATH}"/>
   ${CITIES.map((c,ci)=>{
@@ -1355,6 +1504,7 @@ function mapSvg(){
     const off=r*(act?3.9:2.9)+7;
     return `
    <g class="cityg ${on?'cityhit':''} ${act?'act':''}" opacity="${!on?.2:dim?.18:1}"
+      style="--d:${(.35+order.indexOf(c.id)*.24).toFixed(2)}s"
       ${on?`onclick="setCity('${c.id}')"`:''}>
     ${on&&!dim?`<circle class="city-ripple" cx="${c.x}" cy="${c.y}" r="${r*1.18}"
             style="animation-delay:${(-ci*.43).toFixed(2)}s"/>
@@ -1364,7 +1514,7 @@ function mapSvg(){
           <circle cx="${c.x}" cy="${c.y}" r="${r*(act?2.4:1.8)}" fill="var(--brand)" opacity="${act?.2:.13}"/>`:''}
     ${act?`<circle cx="${c.x}" cy="${c.y}" r="${r*2}" fill="none" stroke="var(--brand-hi)" stroke-width="2.2" opacity=".95"/>`:''}
     <circle class="cdot" cx="${c.x}" cy="${c.y}" r="${r}" fill="${on?'var(--brand-hi)':'var(--ink4)'}"
-      style="animation-delay:${(-ci*.31).toFixed(2)}s"/>
+      style="--pd:${(-ci*.31).toFixed(2)}s"/>
     <text class="clabel" x="${c.x+(c.a==='end'?-off:off)}" y="${c.y+7}" text-anchor="${c.a}"
       style="font-size:${act?24:20}px" fill="${on?'#fff':'var(--ink4)'}">${c[lang]}</text>
     ${on?`<circle cx="${c.x}" cy="${c.y}" r="30" fill="transparent"/>`:''}
@@ -1407,7 +1557,8 @@ function cityPanel(){
      ${f(t('cpStu'),s.students)}${f(t('cpCap'),s.capacity)}${f(t('cpTch'),s.teachers)}
      ${f(t('cpRsv'),s.reserve)}
      ${f(t('cpGr'),s.grants!=null?s.grants.toFixed(1).replace('.',',')+'%':null,'g')}
-     ${f(t('cpNishGr'),s.nishGrants!=null?s.nishGrants.toFixed(1).replace('.',',')+'%':null,'g')}
+     ${f(t('cpNishGr'),s.nishShare!=null?s.nishShare.toFixed(1).replace('.',',')+'%'
+        :s.nishGrants!=null?`${s.nishGrants} ${t('nishKids')}`:null,'g')}
     </div></div>`).join('')}</div>
  </div>`;
 }
@@ -1419,7 +1570,7 @@ function secNet(){
      <div>
        <h2>${t('s1')}</h2>
        <div class="sub">${t('s1s')}</div>
-       <div class="heroTl">${TL.map(x=>`<b>${x.y}</b><s>${x[lang]}</s>`).join('')}</div>
+       <div class="heroTl" onclick="replayHeroIntro()" title="${t('replay')}">${TL.map(x=>`<b>${x.y}</b><s>${x[lang]}</s>`).join('')}</div>
      </div>
      <div class="years">${[null,2022,2023,2024,2025].map(y=>
        `<button class="yr ${yr===y?'on':''}" onclick="setYr(${y})">${y===null?t('all'):y}</button>`).join('')}</div>
@@ -1434,11 +1585,16 @@ function secNet(){
  </section>`;
 }
 
-function secSchools(){
+/* Порядок строк таблицы вынесен отдельно: по нему же стрелки перебирают
+   школы в режиме презентации, иначе перебор шёл бы не так, как видно. */
+function sortedSchools(){
  const val=(s,k)=>k==='school'?s.name:k==='city'?s.city[lang]:s[k];
- const rows=[...SCHOOLS].sort((a,b)=>{const x=val(a,sk),y=val(b,sk);
+ return [...SCHOOLS].sort((a,b)=>{const x=val(a,sk),y=val(b,sk);
    if(x==null)return 1; if(y==null)return -1;
    return typeof x==='string'?x.localeCompare(y)*sd:(x-y)*sd});
+}
+function secSchools(){
+ const rows=sortedSchools();
  const cols=['school','city','year','students','teachers','grants','nishGrants'];
  const D=`<span class="mut">—</span>`;
  const s=SCHOOLS.find(x=>x.id===sel);
@@ -1464,7 +1620,11 @@ function secSchools(){
     <td data-label="${T.th.students[lang]}"><span class="big num">${r.students??''}</span>${r.students==null?D:''}</td>
     <td data-label="${T.th.teachers[lang]}"><span class="big num">${r.teachers??''}</span>${r.teachers==null?D:''}</td>
     <td data-label="${T.th.grants[lang]}"><span class="big num pos">${r.grants!=null?r.grants.toFixed(1).replace('.',',')+'%':''}</span>${r.grants==null?D:''}</td>
-    <td data-label="${T.th.nishGrants[lang]}"><span class="big num pos">${r.nishGrants!=null?r.nishGrants.toFixed(1).replace('.',',')+'%':''}</span>${r.nishGrants==null?D:''}</td>
+    <td data-label="${T.th.nishGrants[lang]}">${r.nishShare!=null
+      ?`<span class="big num pos">${r.nishShare.toFixed(1).replace('.',',')}%</span>`
+      :r.nishGrants!=null
+       ?`<span class="big num pos">${r.nishGrants}</span> <span class="mut">${t('nishKids')}</span>`
+       :D}</td>
   </tr>`).join('')}</tbody></table></div>
  <div class="profile">
    <div class="card" style="display:flex;flex-direction:column">
@@ -1665,10 +1825,29 @@ function winsBlock(){
  </div></div></div>`;
 }
 
+function secSupports(){
+ return `<section id="s3" class="support-section"><div class="sechead">
+   <div><h2>${t('valTitle')}</h2></div></div>
+  <div class="vals">${VALUES.map(v=>`<div class="vl">
+   <span class="ic"><svg viewBox="0 0 24 24">${VICON[v.ic]}</svg></span>
+   <div class="k">${v.k}</div><div class="d">${v[lang]}</div></div>`).join('')}</div>
+ </section>`;
+}
+
+function secFeatures(){
+ return `<section id="s4"><div class="sechead">
+   <div><h2>${t('feat')}</h2><div class="sub">${t('featS')}</div></div></div>
+  <div class="feats">${FEATURES.map((f,i)=>`<div class="fcard">
+   <div class="i num">${i+1}</div>
+   <div><div class="h">${f[lang][0]}</div><div class="d">${f[lang][1]}</div></div>
+  </div>`).join('')}</div>
+ </section>`;
+}
+
 function secResults(){
  const R=54,C=2*Math.PI*R;
  const grantShare=(AGG.grantShare??0).toFixed(1).replace('.',',');
- return `<section id="s3"><div class="sechead">
+  return `<section id="s5"><div class="sechead">
    <div><h2>${t('s3')}</h2><div class="sub">${t('s3s')}</div></div>
    <div class="headstats"><div class="hs"><div class="v num big-n">${grantShare}%</div><div class="l">${t('shr')}</div></div></div></div>
  <div class="gr">
@@ -1733,8 +1912,9 @@ function secResults(){
 }
 
 function secStaff(){
+ const tick=`<span class="tick"><svg viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg></span>`;
  const mx=Math.max(...LADDER.map(r=>r.n));
- return `<section id="s4"><div class="sechead">
+ return `<section id="s6"><div class="sechead">
    <div><h2>${t('s4')}</h2><div class="sub">${t('s4s')}</div></div>
    <div class="headstats"><div class="hs"><div class="v num big-n">${AGG.teachers}</div><div class="l">${T.k[3][lang]}</div></div>
    <div class="hs"><div class="v num">${AGG.msc}</div><div class="l">${lang==='kz'?'магистр':'магистров'}</div></div></div></div>
@@ -1746,28 +1926,12 @@ function secStaff(){
    <div class="ss"><div class="v num big-n">${AGG.hicat}</div><div class="l">${t('hicat')}</div></div>
    <div class="ss"><div class="v num">${AGG.msc}</div><div class="l">${t('msc')}</div></div>
   </div></div>
- <div class="marks">${STAFF_MARKS.map(m=>`<div class="mk">
+  <div class="marks">${STAFF_MARKS.map(m=>`<div class="mk">
    <span class="tick"><svg viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg></span>
    <div>${m.n!=null?`<div class="n num big-n">${m.n}</div>`:''}<div class="d">${m[lang]}</div></div>
- </div>`).join('')}</div>
- </section>`;
-}
-
-function secFeatures(){
- const tick=`<span class="tick"><svg viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg></span>`;
- return `<section id="s5"><div class="sechead">
-   <div><h2>${t('feat')}</h2><div class="sub">${t('featS')}</div></div></div>
- <div class="feats">${FEATURES.map((f,i)=>`<div class="fcard">
-   <div class="i num">${i+1}</div>
-   <div><div class="h">${f[lang][0]}</div><div class="d">${f[lang][1]}</div></div>
- </div>`).join('')}</div>
- <div class="blockhead"><div><h3>${t('valTitle')}</h3></div></div>
- <div class="vals">${VALUES.map(v=>`<div class="vl">
-   <span class="ic"><svg viewBox="0 0 24 24">${VICON[v.ic]}</svg></span>
-   <div class="k">${v.k}</div><div class="d">${v[lang]}</div></div>`).join('')}</div>
-
- <div class="blockhead"><div><h3>${t('synT')}</h3><div class="sub">${t('synS')}</div></div></div>
- <div class="syn">${SYNERGY.map(s=>`<div class="mk">${tick}<div class="d">${s[lang]}</div></div>`).join('')}</div>
+  </div>`).join('')}</div>
+  <div class="blockhead" id="synergy-heading"><div><h3>${t('synT')}</h3><div class="sub">${t('synS')}</div></div></div>
+  <div class="syn" id="synergy-body">${SYNERGY.map(s=>`<div class="mk">${tick}<div class="d">${s[lang]}</div></div>`).join('')}</div>
  </section>`;
 }
 
@@ -1775,6 +1939,23 @@ function secFeatures(){
    Кольца медленно вращаются в разные стороны, узлы стоят на месте —
    иначе подписи было бы не прочесть. */
 const OVB={w:1600,h:740,cx:800,cy:358,rx:672,ry:272,nr:38};
+/* Одна геометрия на кольцо и на его частицы: раньше эллипсы рисовались
+   тегом <ellipse>, а пути частиц дублировались строками в CSS — и стороны
+   вращения разъезжались. Дуги идут с sweep-флагом 1, то есть по часовой;
+   бег пунктира и полёт частицы наследуют направление того же пути. */
+const ORB_RINGS=[
+ {rx:672,ry:272,dash:'5 13',op:.42,spin:14},
+ {rx:492,ry:199,dash:'4 14',op:.32,spin:22},
+ {rx:312,ry:126,dash:'3 12',op:.24,spin:30}
+];
+const orbRingPath=(rx,ry)=>
+ `M${OVB.cx-rx} ${OVB.cy}a${rx} ${ry} 0 1 1 ${rx*2} 0a${rx} ${ry} 0 1 1 ${-rx*2} 0`;
+const ORB_DOTS=[
+ {ring:0,r:5,  c:'#B4FF78',dur:26,delay:0},
+ {ring:0,r:3.4,c:'#66D416',dur:26,delay:-13},
+ {ring:1,r:4.4,c:'#B4FF78',dur:19,delay:-6},
+ {ring:2,r:3.6,c:'#86EB3D',dur:33,delay:-17}
+];
 function orbPos(i){
  const a=(-90+i*45)*Math.PI/180;
  return {x:+(OVB.cx+OVB.rx*Math.cos(a)).toFixed(1), y:+(OVB.cy+OVB.ry*Math.sin(a)).toFixed(1)};
@@ -1788,14 +1969,13 @@ function orbitSvg(){
     <stop offset="100%" stop-color="#66D416" stop-opacity="0"/>
   </radialGradient></defs>
   <g fill="none" stroke-width="1.6">
-    <ellipse class="orb-r"  cx="${cx}" cy="${cy}" rx="672" ry="272" stroke="rgba(102,212,22,.42)" stroke-dasharray="5 13"/>
-    <ellipse class="orb-r2" cx="${cx}" cy="${cy}" rx="492" ry="199" stroke="rgba(102,212,22,.32)" stroke-dasharray="4 14"/>
-    <ellipse cx="${cx}" cy="${cy}" rx="312" ry="126" stroke="rgba(102,212,22,.24)" stroke-dasharray="3 12"/>
+    ${ORB_RINGS.map(r=>`<path class="orb-r" d="${orbRingPath(r.rx,r.ry)}"
+      stroke="rgba(102,212,22,${r.op})" stroke-dasharray="${r.dash}"
+      style="animation-duration:${r.spin}s"/>`).join('')}
   </g>
-  <circle class="odot p1" cx="0" cy="0" r="5"   fill="#B4FF78"/>
-  <circle class="odot p1" cx="0" cy="0" r="3.4" fill="#66D416" style="animation-delay:-13s"/>
-  <circle class="odot p2" cx="0" cy="0" r="4.4" fill="#B4FF78" style="animation-delay:-6s"/>
-  <circle class="odot p3" cx="0" cy="0" r="3.6" fill="#86EB3D" style="animation-delay:-17s"/>
+  ${ORB_DOTS.map(d=>`<circle class="odot" r="${d.r}" fill="${d.c}"
+    style="offset-path:path('${orbRingPath(ORB_RINGS[d.ring].rx,ORB_RINGS[d.ring].ry)}');
+           animation-duration:${d.dur}s;animation-delay:${d.delay}s"/>`).join('')}
   <g class="ocore">
     <ellipse class="halo" cx="${cx}" cy="${cy}" rx="150" ry="132" fill="url(#coreglow)"/>
     <circle cx="${cx}" cy="${cy}" r="104" fill="rgba(102,212,22,.13)" stroke="rgba(134,235,61,.55)" stroke-width="1.8"/>
@@ -1805,10 +1985,26 @@ function orbitSvg(){
   </g>
   ${ORBIT.map((o,i)=>{
     const {x,y}=orbPos(i);
+    /* Кольцо прогресса вокруг узла: на экране должно быть видно не только
+       куда идём, но и где стоим. Раньше текущее значение пряталось в
+       подсказке — чтобы увидеть все восемь, пришлось бы кликать восемь раз.
+       У качественных целей числа нет, поэтому вместо дуги пунктирный ободок:
+       разница читается сразу и ничего не выдумано. */
+    const quant=o.tgt!=null&&o.now!=null&&o.tgt>0;
+    const RR=46, C=+(2*Math.PI*RR).toFixed(1);
+    const pct=quant?Math.max(0,Math.min(1,o.now/o.tgt)):0;
+    const ring=quant
+     ? `<circle class="oring-t" cx="${x}" cy="${y}" r="${RR}"/>
+        <circle class="oring" cx="${x}" cy="${y}" r="${RR}"
+          stroke-dasharray="${C}" stroke-dashoffset="${C}" data-dash="${(C*(1-pct)).toFixed(1)}"
+          transform="rotate(-90 ${x} ${y})"/>`
+     : `<circle class="oring-q" cx="${x}" cy="${y}" r="${RR}"/>`;
     return `<g class="onode ${orbSel===i?'on':''}" onclick="setOrb(${i})">
+      ${ring}
       <circle class="disc" cx="${x}" cy="${y}" r="${nr}"/>
       <g class="oic" transform="translate(${x-13},${y-13}) scale(1.08)">${OIC[o.ic]}</g>
       <text class="olb" x="${x}" y="${y+nr+26}" style="font-size:17px">${lang==='kz'?o.sk:o.sr}</text>
+      ${quant?`<text class="osub" x="${x}" y="${y+nr+50}">${t('orbNow')} ${o.now.toLocaleString('ru-RU')}</text>`:''}
     </g>`}).join('')}
  </svg>`;
 }
@@ -1845,7 +2041,7 @@ function orbitMobile(){
 }
 
 function secStrategy(){
- return `<section id="s6"><div class="share-stage" id="dashboard-share">
+ return `<section id="s7"><div class="share-stage" id="dashboard-share">
    <div class="share-kicker">${t('shareKicker')}</div>
    <h2>${t('shareT')}</h2>
    <div class="share-sub">${t('shareS')}</div>
@@ -1872,7 +2068,7 @@ function render(keep){
  document.getElementById('nav').innerHTML=T.nav.map((n,i)=>`<a href="#s${i+1}">${n[lang]}</a>`).join('');
  document.getElementById('brandsub').textContent=t('brandsub');
  paintFS(); paintLink();
- document.getElementById('main').innerHTML=secNet()+secSchools()+secResults()+secStaff()+secFeatures()+secStrategy();
+ document.getElementById('main').innerHTML=secNet()+secSchools()+secSupports()+secFeatures()+secResults()+secStaff()+secStrategy();
  /* синхронно, до отрисовки кадра: иначе уже показанные разделы
     мигнули бы прозрачностью при каждом клике по фильтру */
  document.querySelectorAll('section').forEach(s=>{
@@ -1901,6 +2097,44 @@ function animateIn(s){
  s.querySelectorAll('[data-w]').forEach(e=>e.style.width=e.dataset.w+'%');
  s.querySelectorAll('[data-dash]').forEach(e=>e.style.strokeDashoffset=e.dataset.dash);
  s.querySelectorAll('[data-c]').forEach(tween);
+ if(s.id==='s1')playHeroIntro();
+}
+const calmMotion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* Каскад ставится один раз на раздел. Класс живёт только на время проигрыша:
+   иначе при следующем перерендере содержимое снова моргало бы с нуля. */
+const staged=new Set();
+function startCascade(s){
+ if(staged.has(s.id)||calmMotion())return;
+ staged.add(s.id);
+ const kids=[...s.children];
+ if(!kids.length)return;
+ kids.forEach((el,i)=>el.style.setProperty('--i',Math.min(i,9)));
+ s.classList.add('cascade');
+ void s.offsetHeight;   // закрепляем стартовое состояние до включения .in
+ setTimeout(()=>{
+  s.classList.remove('cascade');
+  kids.forEach(el=>el.style.removeProperty('--i'));
+ },Math.min(kids.length,10)*78+780);
+}
+
+/* Рост сети: города зажигаются по годам открытия. Проигрывается один раз,
+   повторить можно кликом по строке с годами под заголовком. */
+let heroIntroDone=false;
+function playHeroIntro(){
+ if(heroIntroDone)return;
+ if(calmMotion()){heroIntroDone=true;return}
+ const gs=[...document.querySelectorAll('#map .cityg')];
+ if(!gs.length)return;
+ gs.forEach(g=>g.classList.add('arrive'));
+ heroIntroDone=true;
+ setTimeout(()=>gs.forEach(g=>g.classList.remove('arrive')),(.35+CITIES.length*.24+.7)*1000);
+}
+function replayHeroIntro(){
+ heroIntroDone=false;
+ document.querySelectorAll('#map .cityg').forEach(g=>g.classList.remove('arrive'));
+ void document.getElementById('map')?.offsetHeight;
+ playHeroIntro();
 }
 function tween(el){
  const v=+el.dataset.c, t0=performance.now(), dur=1100;
@@ -1917,7 +2151,7 @@ function spy(){
  ss.forEach((s,i)=>{
   if(s.offsetTop<=y)a=i;
   if(s.getBoundingClientRect().top<innerHeight*0.9){
-    if(!s.classList.contains('in')){s.classList.add('in');animateIn(s)}
+    if(!s.classList.contains('in')){startCascade(s);s.classList.add('in');animateIn(s)}
     revealed.add(s.id);
   }
  });
@@ -1951,7 +2185,25 @@ function setAnnualSchool(id){
  render(1);
 }
 function setAnnualMetric(i){annualMetric=Number(i)||0;render(1)}
-function setOrb(i){orbSel=(orbSel===i)?null:i;render(1)}
+/* Раньше клик по узлу перерисовывал весь раздел. SVG пересоздавался, и
+   вместе с ним обнулялись CSS-анимации: кольца прыгали на старт, частицы
+   телепортировались в начало пути, ядро моргало. Меняем только то, что
+   действительно изменилось — классы узлов и саму подсказку, — поэтому
+   вращение идёт непрерывно и клик больше не дёргает картинку. */
+function setOrb(i){
+ orbSel=(orbSel===i)?null:i;
+ const stage=document.querySelector('.orbstage');
+ if(!stage){render(1);return}
+ stage.querySelectorAll('.onode').forEach((g,k)=>g.classList.toggle('on',k===orbSel));
+ document.querySelectorAll('.orbit-item').forEach((b,k)=>b.classList.toggle('on',k===orbSel));
+ stage.querySelector('.otip')?.remove();
+ if(orbSel===null)return;
+ stage.insertAdjacentHTML('beforeend',orbTip());
+ /* полоса в подсказке должна наливаться, а не появляться готовой:
+    рефлоу на нулевой ширине запускает переход */
+ const fl=stage.querySelector('.otip [data-w]');
+ if(fl){void fl.offsetWidth; fl.style.width=fl.dataset.w+'%'}
+}
 function sortBy(k){if(sk===k)sd*=-1;else{sk=k;sd=-1}render(1)}
 /* ── полноэкранный режим ── */
 const FS_IN ='<path d="M3 8V3h5M16 3h5v5M21 16v5h-5M8 21H3v-5"/>';
@@ -1970,21 +2222,24 @@ function toggleFS(){
 document.addEventListener('fullscreenchange',paintFS);
 document.addEventListener('webkitfullscreenchange',paintFS);
 let presentationNavLocked=false;
+let presentationFrame=null;
+/* step — что перебирают стрелки влево-вправо внутри кадра. Кадры без него
+   реагируют на них как раньше: переходом к соседнему кадру. */
 const PRESENTATION_FRAMES=[
- {top:0},
- {from:'#s2 .sechead',to:'#s2 .tbl'},
- {from:'#s2 .profile',to:'#s2 .profile'},
- {from:'#s3 .sechead',to:'#s3 .gr'},
- {from:'#annual-results',to:'#annual-results'},
- {from:'#wins-heading',to:'#wins-body'},
+ {top:0, step:'year'},
+ {from:'#s2 .sechead',to:'#s2 .tbl', step:'school'},
+ {from:'#s2 .profile',to:'#s2 .profile', step:'school'},
+ {from:'#s3 .sechead',to:'#s3 .vals'},
+ {from:'#s4 .sechead',to:'#s4 .feats'},
+ {from:'#s5 .sechead',to:'#s5 .gr'},
+ {from:'#annual-results',to:'#annual-results', step:'annual'},
+ {from:'#wins-heading',to:'#wins-body', step:'win'},
  {from:'#growth-heading',to:'#growth-body'},
- {from:'#s4 .sechead',to:'#s4 .marks'},
- {from:'#s5 .sechead',to:'#s5 .feats'},
- {from:'#s5 .blockhead:nth-of-type(3)',to:'#s5 .vals'},
- {from:'#s5 .blockhead:nth-of-type(5)',to:'#s5 .syn'},
+ {from:'#s6 .sechead',to:'#s6 .marks'},
+ {from:'#synergy-heading',to:'#synergy-body'},
  {from:'#dashboard-share',to:'#dashboard-share'},
- {from:'#s6 .strategy-head',to:'#s6 .orbwrap'},
- {bottom:true,from:'#s6 .orbwrap',to:'#s6 footer'}
+ {from:'#s7 .strategy-head',to:'#s7 .orbwrap', step:'goal'},
+ {bottom:true,from:'#s7 .orbwrap',to:'#s7 footer'}
 ];
 function presentationFramePoints(){
  const max=Math.max(0,document.documentElement.scrollHeight-innerHeight);
@@ -2021,13 +2276,61 @@ function presentationFrameElements(frame){
  return els;
 }
 function focusPresentationFrame(frame){
+ presentationFrame=frame;
  document.body.classList.add('presentation-mode');
  document.querySelectorAll('.presentation-focus').forEach(el=>el.classList.remove('presentation-focus'));
  presentationFrameElements(frame).forEach(el=>el.classList.add('presentation-focus'));
 }
 function exitPresentationFocus(){
+ presentationFrame=null;
  document.body.classList.remove('presentation-mode');
  document.querySelectorAll('.presentation-focus').forEach(el=>el.classList.remove('presentation-focus'));
+}
+
+/* ── перебор внутри кадра ──
+   Стрелки вверх-вниз всегда ведут между кадрами. Влево-вправо сначала
+   пробуют перебрать содержимое текущего кадра — годы на первом экране,
+   школы в таблице, в годовых результатах и в достижениях, — и только
+   если перебирать нечего, переходят к соседнему кадру.
+   Любой setYr/pick вызывает render(), а render() снимает фокус презентации,
+   поэтому кадр запоминаем до шага и возвращаем фокус после. */
+const PRES_YEARS=[null,2022,2023,2024,2025];
+function stepKeeping(fn){
+ const frame=presentationFrame;
+ fn();
+ if(frame)focusPresentationFrame(frame);
+ return true;
+}
+/* перебор по кругу: на конце списка стрелка возвращает к началу, а не
+   выбрасывает в соседний кадр — иначе на пятом нажатии вправо ведущий
+   неожиданно улетал из раздела. Между разделами ходят стрелки вверх-вниз. */
+function stepList(ids,current,dir,apply){
+ if(!ids.length)return false;
+ let i=ids.indexOf(current);
+ if(i<0)i=dir>0?-1:0;
+ const n=(i+dir+ids.length)%ids.length;
+ return stepKeeping(()=>apply(ids[n]));
+}
+function stepInFrame(dir){
+ if(!document.body.classList.contains('presentation-mode'))return false;
+ switch(presentationFrame&&presentationFrame.step){
+  case 'year':   return stepList(PRES_YEARS,yr,dir,setYr);
+  case 'school': return stepList(sortedSchools().map(s=>s.id),sel,dir,pick);
+  case 'annual': return stepList(
+    [...new Set(ANNUAL.map(r=>r.s))].filter(id=>SCHOOLS.some(s=>s.id===id)),
+    annualSchool,dir,setAnnualSchool);
+  case 'win':    return stepList(
+    SCHOOLS.filter(s=>WINS.some(w=>w.s===s.id)).map(s=>s.id),
+    winSchool,dir,setWinSchool);
+  /* Индексы узлов орбиты уже идут от верхнего по часовой: угол считается
+     как -90+i*45, то есть i=0 стоит наверху, дальше вправо и вниз. Поэтому
+     обычного перебора по индексу достаточно, разворачивать список не нужно.
+     null в начале списка — положение «ничего не выбрано»: пройдя круг,
+     схема сбрасывается и её видно целиком, и лишь следующий шаг начинает
+     обход заново с верхней цели. */
+  case 'goal':   return stepList([null,...ORBIT.map((_,i)=>i)],orbSel,dir,setOrb);
+  default: return false;
+ }
 }
 function stepPresentation(direction){
  if(presentationNavLocked)return;
@@ -2052,12 +2355,14 @@ addEventListener('keydown',e=>{
  if(e.repeat)return;
  const el=document.activeElement;
  if(el&&(el.matches('input,textarea,select')||el.isContentEditable))return;
- if(e.code==='ArrowRight'||e.code==='ArrowDown'){
+ /* вертикаль — между разделами, горизонталь — внутри текущего кадра */
+ if(e.code==='ArrowRight'||e.code==='ArrowLeft'){
   e.preventDefault();
-  stepPresentation(1);
- }else if(e.code==='ArrowLeft'||e.code==='ArrowUp'){
+  const dir=e.code==='ArrowRight'?1:-1;
+  if(!stepInFrame(dir))stepPresentation(dir);
+ }else if(e.code==='ArrowDown'||e.code==='ArrowUp'){
   e.preventDefault();
-  stepPresentation(-1);
+  stepPresentation(e.code==='ArrowDown'?1:-1);
  }
 });
 addEventListener('scroll',spy,{passive:true});
@@ -2107,6 +2412,14 @@ pageHeader.addEventListener('click',e=>{
  scheduleHeaderHide(1400);
 });
 
+/* ═══ СНИМОК ТАБЛИЦЫ ═══
+   Данные, вшитые в файл на случай показа без интернета: на чужом
+   ноутбуке с пустым localStorage дашборд открывается полным, а не
+   заглушкой «загружаем». Пересобирается скриптом snapshot.js. */
+const SNAPSHOT_AT="2026-08-01";
+const SNAPSHOT={"Мектептер":[["ast","ZIS Астана","Астана","2022","","401","400","150","41","",""],["hsa","High School Астана","Астана","2022","","360","360","100","39","94","81"],["shy","ZIS Шымкент","Шымкент","2022","","225","291","50","52","",""],["hss","High School Шымкент","Шымкент","2022","","328","357","300","","207","184"],["zhe","ZIS Жезқазған","Жезказган","2023","","306","360","50","40","",""],["tar","ZIS Тараз","Тараз","2023","","300","300","80","26","77","69"],["aty","ZIS Атырау","Атырау","2024","","238","270","150","33","",""],["alm","ZIS Алматы","Алматы","2025","","270","717","50","33","",""]],"Кадрлар":[["ast","10","0","0","2","9","12","5"],["hsa","13","0","0","2","2","8","27"],["shy","17","0","0","9","4","12","27"],["hss","","","","","","",""],["zhe","5","0","0","2","4","7","22"],["tar","3","0","1","1","1","4","19"],["aty","5","0","0","5","2","3","18"],["alm","15","0","1","10","3","2","17"]],"Жеңістер":[["ast","Nord Atlantic International Physics Olympiad — Eurasia Championship","халықаралық","1","Нұрғали Диас","Бейбіт Аян","","",""],["ast","Neo Science and Coding Olympiad — химия, биология","халықаралық","1","Рысқали Ләйлім","Төлеуханова Әсел, Елубаева Аяулым","","",""],["ast","Педагогикалық идея","республикалық","3","","","иә","",""],["ast","Үздік музыка мұғалімі","республикалық","3","","","иә","",""],["ast","Шебер музыка ұстазы","республикалық","2","","","иә","",""],["ast","Алтын тұғыр","","2","","","иә","2",""],["ast","Алтын тұғыр","","1","","","","",""],["ast","Идея марафон","","1","","","иә","",""],["ast","Пед старт","","2","","","иә","",""],["ast","Bicar Hackaton","","1","","","","",""],["ast","Регата","","2","","","","",""],["ast","Үлкен футбол — әлем чемпионы","","2","","","","",""],["ast","Жас математик","","2","","","","",""],["ast","Математикалық регата","","1","","","иә","2",""],["ast","Импакт Х/А","","2","","","иә","2",""],["ast","Ой сандық","","1","","","иә","3",""],["ast","FizmatFest Primary","","2","","","иә","2",""],["ast","Impact","","2","","","","",""],["ast","Пони","","1","","","","",""],["ast","STEM олимпиадасы","қалалық","3","","","","",""],["ast","Үздік тренер","","бас жүлде","","","иә","",""],["hsa","Ой дамыту","республикалық","1","","","","",""],["hsa","Ой-сандық","республикалық","бас жүлде","","","","2",""],["hsa","Педагогикалық идея","республикалық","3","","","иә","",""],["hsa","Математикалық регата","облыстық","2","","","","",""],["hsa","Математикалық регата","облыстық","3","","","","",""],["hsa","Жас математик","облыстық","2","","","","",""],["hsa","Педагогикалық инновация шеберханасы","облыстық","1","","","иә","",""],["hsa","Педагогикалық инновация шеберханасы","облыстық","3","","","иә","",""],["hsa","Педагогикалық инновация шеберханасы","облыстық","грамота","","","иә","",""],["hsa","Мұғалімдер олимпиадасы — биология, химия","қалалық","1","","","иә","",""],["shy","Алтын тұғыр","","1","","","","",""],["shy","Алтын тұғыр","","бас жүлде","","","","",""],["shy","Педагогикалық идеялар панорамасы","","2","","","иә","",""],["shy","Математикалық регата","","2","","","","",""],["shy","Математикалық регата","","1","","","","",""],["shy","Үздік математик — 2024","","2","","","","",""],["shy","Үздік математик — 2025","","3","","","","",""],["shy","Педстарт","","","","","иә","",""],["shy","Мұғалімдер спартакиадасы","","1","","","иә","",""],["zhe","Математикалық регата","облыстық","3","Төлепберген Сымбат Қаржаубайқызы","","","",""],["zhe","Математикалық регата","облыстық","3","Усман Еркін Жаныбекұлы","","","",""],["zhe","Дарынды балаларға — талантты ұстаз","республикалық","грамота","Шегебаева Назерке","","иә","",""],["zhe","«Олимп шыңы» химия олимпиадасы","республикалық","2","Алибекова Сандугаш Сарсеновна","","","",""],["tar","Математика-регата — бастауыш мұғалімдері, 2026","қалалық","1","Ақпанбаева Дина","","иә","",""],["tar","Ой-сандық — жұптық","облыстық","1","","","","",""],["tar","Математикалық регата","облыстық","3","Катибеков Ербол","","","",""],["aty","«Жәутіков» олимпиадасы","республикалық","3","Амирбек А.","","","",""],["aty","«Жәутіков» олимпиадасы","республикалық","3","Жанұзақ С.","","","",""],["aty","«Жәутіков» олимпиадасы","республикалық","алғыс хат","Қарақұл Б., Сайлаубаев А., Тілекбай А., Мүтиғолла З., Абай М.","","","5",""],["aty","«Смағұлов» олимпиадасы — II кезең","облыстық","2","Жанұзақ С.","","","",""],["aty","«Смағұлов» олимпиадасы — II кезең","облыстық","3","Амирбек А.","","","",""],["aty","«Смағұлов» олимпиадасы — II кезең","облыстық","3","Сайлаубаев А.","","","",""],["aty","«Смағұлов» олимпиадасы — II кезең","облыстық","алғыс хат","Уалит Н.","","","",""],["aty","Педоқу","қалалық","1","Ташеменов Қ.","","иә","",""],["aty","Педоқу","қалалық","1","Қасымов А.","","иә","",""],["aty","Педоқу","қалалық","2","Кубенкулова А.","","иә","",""],["aty","Алтын тұғыр","қалалық","1","Хайруллина Г.","","иә","",""],["aty","Алтын тұғыр","қалалық","2","Айдынгалиева А.","","иә","",""],["aty","Алтын тұғыр","қалалық","2","Амантай О.","","иә","",""],["aty","Алтын тұғыр","қалалық","3","Алдиярова Д.","","иә","",""],["aty","Алтын тұғыр","қалалық","алғыс хат","Валериева Б.","","иә","",""],["aty","«Зерде» ғылыми жобасы","қалалық","3","","","","",""],["aty","«Pro eco» экологиялық жобасы","қалалық","2","","","","",""]],"Өсу":[["shy","«Алтын сақа» жеңімпаздары","Победители «Алтын сақа»","5","17"],["aty","«Алтын сақа» чемпиондары","Чемпионы «Алтын сақа»","1","8"],["tar","Халықаралық олимпиада чемпиондары","Чемпионы международных олимпиад","2","7"],["ast","Республикалық чемпиондар","Республиканские чемпионы","2","6"],["zhe","Облыстық чемпиондар","Областные чемпионы","12","19"],["hsa","Облыстық олимпиада чемпиондары","Чемпионы областных олимпиад","6","11"]],"Үйірмелер":[["ast","","",""],["hsa","","",""],["shy","","",""],["hss","","",""],["zhe","","",""],["tar","","",""],["aty","","",""],["alm","","",""]],"Стратегия":[["Код Код","Мақсат (қысқа) Цель (кратко)","Түрі Тип","Қазір Сейчас","Жоспар План","Толық сипаттама (қаз) Полное описание (каз)","Толық сипаттама (рус) Полное описание (рус)"],["school","20 мектеп","сандық","","20","15-тен астам қалада кемінде 20 мектеп қалыптастыру","Не менее 20 школ более чем в 15 городах"],["people","1000 ұстаз","сандық","","1000","1000-нан астам мұғалімдер командасы","Команда более чем из 1000 педагогов"],["grad","8000 оқушы","сандық","","8000","8000-ға жуық оқушы желіде білім алады","Около 8000 учеников в сети"],["globe","3 IB","сандық","0","3","Кемінде 3 мектеп IB халықаралық стандартына ие болады","Не менее 3 школ со стандартом IB"],["patent","Патент","сапалық","","","Мектептер желісінің патенттелген өзіндік жүйесі","Запатентованная собственная система сети школ"],["smart","SMART","сапалық","","","SMART материалдық база мен технологиясы бар, ЖАТАҚХАНАМЕН қамтылған үлгілі мектеп","Образцовая школа со SMART-базой и общежитием"],["ai","AI","сапалық","","","Жасанды интеллект пен цифрлық технологияны оңтайлы пайдалана отырып білім беру","Обучение с использованием искусственного интеллекта и цифровых технологий"],["cup","IMO · IFO","сапалық","","","IMO және IFO жеңімпаздарын шығару, пәндік олимпиадалардан тұрақты жеңіс","Победители IMO и IFO, устойчивые победы на предметных олимпиадах"]],"Мәтіндер":[["ерекшелік","Тәрбие мен ұлттық құндылықтың үздіксіздігі","Бала күні бойы ортада болғандықтан, үлкенге құрмет, домбыра, шахмат, тоғызқұмалақ пен отаншылдық күнделікті мінез-құлыққа айналады","Ребёнок весь день в среде, поэтому уважение к старшим, домбра, шахматы, тоғызқұмалақ и патриотизм становятся ежедневной привычкой"],["ерекшелік","Тереңдетілген академиялық жүйе және CLIL","Математика, Science, химия, биология, физика ағылшын тілінде негізгі кестеге интеграцияланған — ғылыми терминологияны жастайынан меңгеру","Математика, Science, химия, биология, физика на английском встроены в основное расписание — научная терминология с ранних лет"],["ерекшелік","Олимпиадалық академия, STEAM және робототехника","7–9-сыныптан жаратылыстану бағытындағы олимпиадалық резерв, бастауыштан бастап робототехника жарыстарына даярлық","С 7–9 класса олимпиадный резерв по естественным наукам, с начальной школы — подготовка к соревнованиям по робототехнике"],["ерекшелік","IELTS / SAT / NUET және ТОП-100 университет","Халықаралық емтихандар мен жоғары оқу орнына түсу оқу бағдарламасының ажырамас бөлігі, заманауи профориентация","Международные экзамены и поступление — неотъемлемая часть программы, современная профориентация"],["тірек","Зерделі бала","Сыни ойлайтын зерттеуші, ұлттық рухы бекем және бәсекеге қабілетті жауапты заманауи тұлға","Критически мыслящий исследователь, с крепким национальным духом, конкурентоспособная и ответственная современная личность"],["тірек","Зерделі ұстаз","Білімді әрі рухты ұрпақ тәрбиелеп, ел болашағына жанашыр тұлға қалыптастыру","Воспитать образованное и духовное поколение, формировать личность, неравнодушную к будущему страны"],["тірек","Зерделі отбасы","Мектеппен бірге — сапалы орта мен ұлттық құндылықтың негізін қалайды","Вместе со школой закладывает основу качественной среды и национальных ценностей"],["тірек","Зерделі орта","Бәсекеге қабілетті, ұлттық рухы биік, мәдениетті әрі заманауи дағдыланған жаңа орта","Конкурентоспособная, с высоким национальным духом, культурная и современная новая среда"],["синергия","","Маркетингтік тиімділік: Мектеп жетістіктері сол қаладағы орталықтарға оқушы әкеледі","Маркетинговая эффективность: успехи школ приводят учеников в центры того же города"],["синергия","","Зерделі қызметкерлеріне балаларын ZIS-те оқытуға жеңілдіктер","Сотрудникам Zerdeli — льготы на обучение детей в ZIS"],["синергия","","Орталық кадрларына Зерделі HR жүйесінде мансаптық лифт","Кадрам центров — карьерный лифт в HR-системе Zerdeli"],["құрам","","«Болашақ» бағдарламасының түлектері","Выпускники программы «Болашақ»"],["құрам","","Математика бойынша PhD дәрежесі","PhD по математике"],["құрам","","Мемлекеттік мектептерде 30 жыл басшылық еткен ұстаздар","Руководители с 30-летним стажем в государственных школах"],["құрам","","Білім саласындағы бұрынғы мемлекеттік қызметкерлер (Білім министрлігі, облыстық білім басқармасы, қалалық білім бөлімі)","Бывшие государственные служащие в сфере образования (Министерство образования, областное управление образования, городской отдел образования)"]],"Баптаулар":[["Параметр Параметр Салыстыру кезеңі басы Салыстыру кезеңі соңы","Мән Значение ","Түсініктеме Пояснение напр. 2023–2024 — с какого года считается рост напр. 2025–2026"],["Желідегі оқушы саны","2428","мектептер жолдарының сомасы + бөлінбеген оқушы"],["Қала саны","6","мектептер тізіміндегі бірегей қалалар"],["Жаңарту күні","","дата последнего обновления таблицы"],["Педагог саны","264","мектептер жолдарының сомасы + бөлінбеген педагог"],["НИШ гранты ast","25",""],["НИШ гранты hsa","",""],["НИШ гранты shy","24",""],["НИШ гранты hss","",""],["НИШ гранты zhe","25",""],["НИШ гранты tar","",""],["НИШ гранты aty","24",""],["НИШ гранты alm","6",""],["НИШ гранты ast","","ZIS Астана · грант үлесі, %"],["НИШ гранты hsa","","High School Астана · грант үлесі, %"],["НИШ гранты shy","","ZIS Шымкент · грант үлесі, %"],["НИШ гранты hss","","High School Шымкент · грант үлесі, %"],["НИШ гранты zhe","","ZIS Жезқазған · грант үлесі, %"],["НИШ гранты tar","","ZIS Тараз · грант үлесі, %"],["НИШ гранты aty","","ZIS Атырау · грант үлесі, %"],["НИШ гранты alm","","ZIS Алматы · грант үлесі, %"],["Мектептерге бөлінбеген оқушы","","расталған жалпы сан мен мектептер жолдарының айырмасы"],["Мектептерге бөлінбеген педагог","","расталған жалпы сан мен мектептер жолдарының айырмасы"],["Мектеп саны","8","id толтырылған мектептер саны"],["ҰБТ түлек саны","378","қорытынды мәртебесі бар түлектер"],["ҰБТ грант саны","334","қорытынды мәртебесі бар гранттар"],["ҰБТ грантының жалпы үлесі","88.4%","ҰБТ грант саны / түлек саны, %"]],"Жылдық нәтижелер":[["ast","Пән олимпиадасы — республикалық чемпиондар","Предметные олимпиады — республиканские чемпионы","2","4","6",""],["ast","Пән олимпиадасы — облыстық чемпиондар","Предметные олимпиады — областные чемпионы","19","26","29",""],["ast","«Алтын сақа» — республикалық чемпиондар","«Алтын сақа» — республиканские чемпионы","2","3","2",""],["ast","Халықаралық олимпиада чемпиондары","Чемпионы международных олимпиад","","27","45",""],["ast","Олимпиадалық академия — командалық жеңімпаздар","Олимпиадная академия — командные победители","","3","5",""],["hsa","Пән олимпиадасы — республикалық чемпиондар","Предметные олимпиады — республиканские чемпионы","","0","8",""],["hsa","Пән олимпиадасы — облыстық чемпиондар","Предметные олимпиады — областные чемпионы","","6","11",""],["hsa","Халықаралық олимпиада чемпиондары","Чемпионы международных олимпиад","","1","2",""],["shy","Пән олимпиадасы — республикалық чемпиондар","Предметные олимпиады — республиканские чемпионы","14","30","4",""],["shy","Пән олимпиадасы — облыстық чемпиондар","Предметные олимпиады — областные чемпионы","22","24","13",""],["shy","«Алтын сақа» — республикалық чемпиондар","«Алтын сақа» — республиканские чемпионы","","5","17",""],["shy","Халықаралық олимпиада чемпиондары","Чемпионы международных олимпиад","","5","6",""],["shy","Олимпиадалық академия — командалық жеңімпаздар","Олимпиадная академия — командные победители","","2","2",""],["zhe","Пән олимпиадасы — республикалық чемпиондар","Предметные олимпиады — республиканские чемпионы","0","4","6",""],["zhe","Пән олимпиадасы — облыстық чемпиондар","Предметные олимпиады — областные чемпионы","0","12","19",""],["zhe","«Алтын сақа» — республикалық чемпиондар","«Алтын сақа» — республиканские чемпионы","4","4","5",""],["zhe","Халықаралық олимпиада чемпиондары","Чемпионы международных олимпиад","","6","0",""],["zhe","Олимпиадалық академия — командалық жеңімпаздар","Олимпиадная академия — командные победители","","1","2",""],["tar","Пән олимпиадасы — республикалық чемпиондар","Предметные олимпиады — республиканские чемпионы","","2","2",""],["tar","Пән олимпиадасы — облыстық чемпиондар","Предметные олимпиады — областные чемпионы","","6","6",""],["tar","«Алтын сақа» — республикалық чемпиондар","«Алтын сақа» — республиканские чемпионы","","4","4",""],["tar","Халықаралық олимпиада чемпиондары","Чемпионы международных олимпиад","","2","7",""],["tar","Олимпиадалық академия — командалық жеңімпаздар","Олимпиадная академия — командные победители","","","","2024–2025: 5-сынып — I, 4-сынып — III, 3-сынып — III; 2025–2026: 3-сынып — II, 4-сынып ZIS-1 — I, ZIS-2 — III, 5-сынып — III"],["aty","Пән олимпиадасы — республикалық чемпиондар","Предметные олимпиады — республиканские чемпионы","0","1","1",""],["aty","Пән олимпиадасы — облыстық чемпиондар","Предметные олимпиады — областные чемпионы","0","1","3",""],["aty","«Алтын сақа» — республикалық чемпиондар","«Алтын сақа» — республиканские чемпионы","0","1","8",""],["aty","Халықаралық олимпиада чемпиондары","Чемпионы международных олимпиад","","9","9",""],["aty","Олимпиадалық академия — командалық жеңімпаздар","Олимпиадная академия — командные победители","","2","3",""],["alm","Пән олимпиадасы — облыстық чемпиондар","Предметные олимпиады — областные чемпионы","","","4",""],["alm","«Алтын сақа» — республикалық чемпиондар","«Алтын сақа» — республиканские чемпионы","","","1",""],["alm","Халықаралық олимпиада чемпиондары","Чемпионы международных олимпиад","","","1",""],["alm","Олимпиадалық академия — командалық жеңімпаздар","Олимпиадная академия — командные победители","","","1",""]]};
+/* ═══ КОНЕЦ СНИМКА ═══ */
+
 /* ═══ ЧТЕНИЕ ГУГЛ-ТАБЛИЦЫ ═══ */
 function parseCsv(text){
  const rows=[]; let row=[], cur='', q=false;
@@ -2127,7 +2440,7 @@ const HDR=new Set(['id','id id','Мектеп id','id школы','Мектеп 
 const dataRows=rs=>rs.filter(r=>r.length&&String(r[0]).trim()&&!HDR.has(String(r[0]).trim()));
 
 const sv=v=>String(v??'').trim();
-const nv=v=>{const s=sv(v).replace(/\s| /g,'').replace(',','.');return s===''||isNaN(+s)?null:+s};
+const nv=v=>{const s=sv(v).replace(/\s| /g,'').replace(/%/g,'').replace(',','.');return s===''||isNaN(+s)?null:+s};
 const html=v=>sv(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LVLB={'халықаралық':'int','республикалық':'rep','облыстық':'obl','қалалық':'city'};
 const PLCB={'1':1,'2':2,'3':3,'бас жүлде':'gp','грамота':'gr','алғыс хат':'let'};
@@ -2224,7 +2537,16 @@ function applySettings(st){
  if(nv(st['ҰБТ түлек саны'])!=null) AGG.graduates=nv(st['ҰБТ түлек саны']);
  if(nv(st['ҰБТ грант саны'])!=null) AGG.granted=nv(st['ҰБТ грант саны']);
  if(nv(st['ҰБТ грантының жалпы үлесі'])!=null) AGG.grantShare=nv(st['ҰБТ грантының жалпы үлесі']);
- SCHOOLS.forEach(s=>{s.nishGrants=nv(st[`НИШ гранты ${s.id}`])});
+ /* «НИШ гранты» — это количество детей, а не доля. Чтобы показать процент,
+    нужен знаменатель: сколько человек из школы вообще поступало на НИШ.
+    Пока строки «НИШ талапкер <id>» в «Баптаулар» пустые, показываем штуки;
+    как только их заполнят — то же поле само станет процентом. */
+ SCHOOLS.forEach(s=>{
+  s.nishGrants=nv(st[`НИШ гранты ${s.id}`]);
+  s.nishCand=nv(st[`НИШ талапкер ${s.id}`]);
+  s.nishShare=(s.nishCand>0&&s.nishGrants!=null)
+    ? +(s.nishGrants/s.nishCand*100).toFixed(1) : null;
+ });
 }
 
 function applyApiData(d){
@@ -2273,7 +2595,9 @@ function applyApiData(d){
   s:sv(r.s),kz:sv(r.kz),ru:sv(r.ru),
   values:(r.values||[]).slice(0,3).map(nv),note:sv(r.note)
  })).filter(r=>r.s&&r.kz&&r.values.some(v=>v!=null));
- ANNUAL.splice(0,ANNUAL.length,...annual);
+ /* Apps Script вкладку «Жылдық нәтижелер» пока не отдаёт: без этой проверки
+    ответ по API стирал бы весь блок годовых результатов, собранный по CSV */
+ if(annual.length)ANNUAL.splice(0,ANNUAL.length,...annual);
 
  const growth=(d.growth||[]).map(g=>{
   const o=byId(sv(g.s));
@@ -2287,7 +2611,7 @@ function applyApiData(d){
  (d.goals||[]).forEach(g=>{
   const o=ORBIT.find(x=>x.ic===sv(g.ic)); if(!o)return;
   if(sv(g.short)){o.sk=sv(g.short);o.sr=sv(g.short)}
-  o.now=nv(g.now); o.tgt=nv(g.tgt);
+  o.nowOverride=nv(g.now); o.tgt=nv(g.tgt);
   if(sv(g.kz))o.kz=sv(g.kz); if(sv(g.ru))o.ru=sv(g.ru);
  });
 
@@ -2355,7 +2679,7 @@ function applySheet(d){
  (d['Стратегия']||[]).forEach(r=>{
   const o=ORBIT.find(x=>x.ic===sv(r[0])); if(!o)return;
   if(sv(r[1])){o.sk=sv(r[1]);o.sr=sv(r[1])}
-  if(nv(r[3])!=null)o.now=nv(r[3]);
+  o.nowOverride=nv(r[3]);
   if(nv(r[4])!=null)o.tgt=nv(r[4]);
   if(sv(r[5]))o.kz=sv(r[5]); if(sv(r[6]))o.ru=sv(r[6]);
  });
@@ -2374,13 +2698,20 @@ function applySheet(d){
  CLUBS.splice(0,CLUBS.length,...(d['Үйірмелер']||[])
    .filter(r=>sv(r[1])).map(r=>({s:sv(r[0]),name:sv(r[1]),area:sv(r[2]),lead:sv(r[3])})));
 
- const st={}; (d['Баптаулар']||[]).forEach(r=>st[sv(r[0])]=r[1]);
+ /* В «Баптаулар» блок «НИШ гранты …» продублирован: первый заполнен, второй
+    пуст. При простом присваивании побеждала последняя строка и пустой дубль
+    затирал живые числа. Пустое значение больше не перебивает заполненное. */
+ const st={};
+ (d['Баптаулар']||[]).forEach(r=>{
+  const k=sv(r[0]); if(!k)return;
+  if(sv(r[1])!==''||!(k in st))st[k]=r[1];
+ });
  applySettings(st);
  derive();
 }
 
 async function connectSheet(){
- if(!SHEET.on||sheetConnecting)return false;
+ if(!SHEET.on||sheetConnecting||offlineMode())return false;
  clearTimeout(sheetRetryTimer);
  sheetConnecting=true;
  sheetLastAttempt=Date.now();
@@ -2432,7 +2763,7 @@ async function connectSheet(){
 function scheduleSheetReconnect(){
  clearTimeout(sheetRetryTimer);
  const stale=sheetState.error&&['cache','memory'].includes(sheetState.source);
- if(!SHEET.on||!SHEET.strict||(sheetState.status!=='waiting'&&!stale))return;
+ if(!SHEET.on||!SHEET.strict||offlineMode()||(sheetState.status!=='waiting'&&!stale))return;
  sheetRetryTimer=setTimeout(()=>{
   if(document.body.classList.contains('presentation-mode'))scheduleSheetReconnect();
   else connectSheet();
@@ -2442,25 +2773,80 @@ function paintLink(){
  const el=document.getElementById('link'); if(!el)return;
  const ok=sheetState.status==='sheet';
  const waiting=sheetState.status==='waiting';
+ /* подпись источника попадает в меню на виду у зала, поэтому она двуязычна */
  const via={
-  api:'Apps Script JSON',
-  cache:'Google Sheets кеші',
-  csv:'Google Sheets CSV',
-  memory:'Google Sheets — текущая сессия',
-  embedded:'встроенные данные'
- }[sheetState.source]||sheetState.source;
- el.className='link '+(ok?'ok':waiting?'wait':'off');
- el.title=ok
-  ?`${t('linkOn')} · ${via}${sheetState.when?' · '+sheetState.when:''}${sheetState.error?' · '+sheetState.error:''}`
-  :waiting
-   ?`${t('linkWait')}${sheetState.error?' · '+sheetState.error:''}`
-   :`${t('linkOff')}${sheetState.error?' — '+sheetState.error:''}`;
- el.querySelector('span').textContent=ok?t('linkOn'):waiting?t('linkWait'):t('linkOff');
- document.body.classList.toggle('sheet-waiting',waiting);
+  api:{kz:'Apps Script JSON',ru:'Apps Script JSON'},
+  cache:{kz:'Google Sheets көшірмесі',ru:'копия Google Sheets'},
+  snapshot:{kz:'файлдағы көшірме',ru:'копия в файле'},
+  csv:{kz:'Google Sheets CSV',ru:'Google Sheets CSV'},
+  memory:{kz:'Google Sheets — ағымдағы сеанс',ru:'Google Sheets — текущая сессия'},
+  embedded:{kz:'файлдағы дерек',ru:'данные из файла'}
+ }[sheetState.source]?.[lang]||sheetState.source;
+ const off=offlineMode();
+ el.className='link '+(off?'local':ok?'ok':waiting?'wait':'off');
+ el.title=off
+  ?`${t('srcOffline')} · ${via}${sheetState.when?' · '+sheetState.when:''}`
+  :ok
+   ?`${t('linkOn')} · ${via}${sheetState.when?' · '+sheetState.when:''}${sheetState.error?' · '+sheetState.error:''}`
+   :waiting
+    ?`${t('linkWait')}${sheetState.error?' · '+sheetState.error:''}`
+    :`${t('linkOff')}${sheetState.error?' — '+sheetState.error:''}`;
+ el.querySelector('span').textContent=off?t('linkLocal'):ok?t('linkOn'):waiting?t('linkWait'):t('linkOff');
+ /* заглушку показываем только онлайн: в офлайне ждать нечего, и накрывать
+    ею дашборд посреди выступления — худшее, что можно сделать */
+ document.body.classList.toggle('sheet-waiting',waiting&&!off);
+ paintSrcMenu(via);
  const gateTitle=document.getElementById('sheetgate-title');
  const gateError=document.getElementById('sheetgate-error');
  if(gateTitle)gateTitle.textContent=t('sheetWait');
  if(gateError)gateError.textContent=waiting&&sheetState.error?sheetState.error:'';
+}
+
+function paintSrcMenu(via){
+ const box=document.getElementById('srcmenu'); if(!box)return;
+ const off=offlineMode();
+ const stamp=sheetState.when?`${via} · ${sheetState.when}`:via;
+ const opt=(mode,key,hint,active)=>
+  `<button class="srcopt ${active?'on':''}" onclick="setSheetMode('${mode}')">
+     <i></i><span><b>${t(key)}</b><s>${hint}</s></span>
+   </button>`;
+ box.innerHTML=
+  `<h6>${t('srcTitle')}</h6>`+
+  opt('online','srcOnline',off?t('srcOnlineHint'):stamp,!off)+
+  opt('offline','srcOffline',off?stamp:t('srcOfflineHint'),off)+
+  `<div class="srcsep"></div>
+   <button class="srcrefresh" onclick="refreshSheet()" ${off?'disabled':''}>
+     <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg>
+     ${off?t('srcNoNet'):t('srcRefresh')}
+   </button>`;
+}
+function toggleSrcMenu(force){
+ const box=document.getElementById('srcmenu'); if(!box)return;
+ box.classList.toggle('open',force===undefined?!box.classList.contains('open'):force);
+}
+function setSheetMode(mode){
+ toggleSrcMenu(false);
+ if(mode===sheetMode)return;
+ sheetMode=mode;
+ try{localStorage.setItem(SHEET_MODE_KEY,mode)}catch(_){}
+ if(offlineMode()){
+  /* сеть больше не трогаем; на экране остаются те цифры, что уже загружены,
+     поэтому источник переименовываем, но данные не перезагружаем */
+  clearTimeout(sheetRetryTimer);
+  if(sheetState.status!=='sheet')
+   sheetState={status:'local',source:'embedded',when:null,error:null};
+  document.body.classList.remove('sheet-waiting');
+  paintLink();
+ }else{
+  paintLink();
+  connectSheet();
+ }
+}
+function refreshSheet(){
+ if(offlineMode())return;
+ toggleSrcMenu(false);
+ sheetLastAttempt=0;
+ connectSheet();
 }
 
 /* Последний успешный ответ Sheets показываем сразу, пока в фоне идёт
@@ -2469,12 +2855,28 @@ const initialSheetCache=loadSheetCache();
 if(initialSheetCache){
  applySheetCache(initialSheetCache);
  sheetState={status:'sheet',source:'cache',when:sheetTime(initialSheetCache.savedAt),error:null};
+}else if(typeof SNAPSHOT!=='undefined'){
+ /* Вшитый снимок — гарантированный пол. На чужом ноутбуке с пустым
+    localStorage и без сети дашборд открывается полным, а не заглушкой
+    «загружаем данные». Годовые результаты существуют только здесь и в
+    таблице — без снимка офлайн этот блок был бы пустым. */
+ applySheet(SNAPSHOT);
+ sheetState={status:'sheet',source:'snapshot',when:SNAPSHOT_AT,error:null};
 }
+if(offlineMode()&&sheetState.status!=='sheet')
+ sheetState={status:'local',source:'embedded',when:null,error:null};
 render();
 paintLink();
-document.getElementById('link')?.addEventListener('click',()=>connectSheet());
+const linkEl=document.getElementById('link');
+linkEl?.addEventListener('click',e=>{e.stopPropagation();toggleSrcMenu()});
+linkEl?.addEventListener('keydown',e=>{
+ if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleSrcMenu()}});
+document.addEventListener('click',e=>{
+ if(!e.target.closest('.linkwrap'))toggleSrcMenu(false)});
+addEventListener('keydown',e=>{if(e.key==='Escape')toggleSrcMenu(false)});
 const reconnectSheet=()=>{
  if(document.visibilityState==='visible'
+  &&!offlineMode()
   &&!document.body.classList.contains('presentation-mode')
   &&Date.now()-sheetLastAttempt>20000)connectSheet();
 };

@@ -1400,7 +1400,35 @@ function onOpen() {
     .createMenu('ZIS дашборд')
     .addItem('Собрать структуру', 'buildStructure')
     .addItem('Выгрузить JSON', 'exportJson')
+    .addItem('Очистить «сейчас» у расчётных целей', 'clearDerivedGoals')
     .addToUi();
+}
+
+/* Три цели повторяют общие показатели сети: число школ, педагогов и учеников
+   дашборд считает по листам «Мектептер» и «Баптаулар». Пока в «Стратегии»
+   лежит своя копия этих чисел, показывается она — и расходится с первым
+   экраном: там стояли 294 педагога и 2500 учеников против 264 и 2428.
+   Пустая ячейка «Қазір Сейчас» означает «считай сам». Заполненная остаётся
+   ручной поправкой и по-прежнему побеждает, так что цель можно в любой
+   момент увести с автоподсчёта, просто вписав число обратно. */
+var DERIVED_GOALS = ['school', 'people', 'grad'];
+
+function clearDerivedGoals() {
+  var ui = SpreadsheetApp.getUi();
+  var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Стратегия');
+  if (!sh) { ui.alert('Лист «Стратегия» не найден'); return; }
+  var v = sh.getDataRange().getValues();
+  var done = [];
+  for (var i = 0; i < v.length; i++) {
+    if (DERIVED_GOALS.indexOf(str(v[i][0])) < 0) continue;
+    if (str(v[i][3]) === '') continue;
+    done.push('  ' + str(v[i][1]) + ' — было ' + str(v[i][3]));
+    sh.getRange(i + 1, 4).clearContent();
+  }
+  ui.alert(done.length
+    ? 'Очищена колонка «Қазір Сейчас»:\n' + done.join('\n')
+      + '\n\nТеперь дашборд берёт эти числа из общих показателей.'
+    : 'Очищать нечего — дашборд уже считает эти числа сам.');
 }
 
 function buildStructure() {
