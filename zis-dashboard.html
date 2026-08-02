@@ -2069,6 +2069,14 @@ function render(keep){
  document.getElementById('brandsub').textContent=t('brandsub');
  paintFS(); paintLink();
  document.getElementById('main').innerHTML=secNet()+secSchools()+secSupports()+secFeatures()+secResults()+secStaff()+secStrategy();
+ /* Жеңістер и двухлетний рост относятся к результатам, но в сценарии совета
+    идут после кадров и годовой динамики. Переставляем уже собранные блоки
+    синхронно, до первого кадра: данные и фильтры остаются в своих функциях,
+    а фактический DOM-порядок совпадает с презентационным. */
+ const lowerResultsAnchor=document.getElementById('synergy-heading');
+ ['wins-heading','wins-body','growth-heading','growth-body'].forEach(id=>{
+   const block=document.getElementById(id); if(block&&lowerResultsAnchor)lowerResultsAnchor.before(block);
+ });
  /* синхронно, до отрисовки кадра: иначе уже показанные разделы
     мигнули бы прозрачностью при каждом клике по фильтру */
  document.querySelectorAll('section').forEach(s=>{
@@ -2232,10 +2240,10 @@ const PRESENTATION_FRAMES=[
  {from:'#s3 .sechead',to:'#s3 .vals'},
  {from:'#s4 .sechead',to:'#s4 .feats'},
  {from:'#s5 .sechead',to:'#s5 .gr'},
- {from:'#wins-heading',to:'#wins-body', step:'win'},
- {from:'#growth-heading',to:'#growth-body'},
  {from:'#s6 .sechead',to:'#s6 .marks'},
  {from:'#annual-results',to:'#annual-results', step:'annual'},
+ {from:'#wins-heading',to:'#wins-body', step:'win'},
+ {from:'#growth-heading',to:'#growth-body'},
  {from:'#synergy-heading',to:'#synergy-body'},
  {from:'#dashboard-share',to:'#dashboard-share'},
  {from:'#s7 .strategy-head',to:'#s7 .orbwrap', step:'goal'},
