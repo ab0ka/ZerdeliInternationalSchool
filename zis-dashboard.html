@@ -71,6 +71,36 @@ body{
 body::before{content:'';position:fixed;inset:0;z-index:45;pointer-events:none;opacity:.05;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='180' height='180' filter='url(%23n)'/></svg>")}
 
+/* Фон со сцены Зердебека — только подсвеченная надпись ZIS по центру.
+   Лежит отдельным слоем позади содержимого. isolation на body нужен именно
+   для этого: без него слой с z-index:-1 ушёл бы в корневой контекст
+   наложения и его накрыли бы градиенты самого body. С isolation порядок
+   такой: фон body → надпись → содержимое. Свечение и виньетку не трогаем —
+   на них держится читаемость текста. */
+body{isolation:isolate}
+.stage-bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+/* Надпись не просто контур, а подсвеченная: по буквам медленно ходит блик —
+   заливка градиентом, обрезанным по тексту, — а обводка параллельно дышит
+   свечением. Периоды нарочно несоразмерны, 9 и 5,2 с: совпади они, блик и
+   пульс сошлись бы в один такт и читались бы как мигание. Снизу буквы
+   растворяются маской, иначе нижняя кромка резала бы содержимое. */
+.stage-word{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:max-content;font-size:clamp(330px,46vw,760px);font-weight:900;line-height:.78;
+  letter-spacing:0;user-select:none;color:transparent;
+  -webkit-text-stroke:1px rgba(133,174,117,.035);
+  background:linear-gradient(100deg,rgba(102,212,22,.011) 15%,rgba(190,221,177,.042) 44%,rgba(102,212,22,.011) 72%);
+  background-size:230% 100%;-webkit-background-clip:text;background-clip:text;
+  -webkit-mask-image:linear-gradient(180deg,#000 0 80%,rgba(0,0,0,.42) 87%,transparent 93%);
+  mask-image:linear-gradient(180deg,#000 0 80%,rgba(0,0,0,.42) 87%,transparent 93%);
+  animation:stageWordLight 9s ease-in-out infinite,stageWordBreathe 5.2s ease-in-out infinite}
+@keyframes stageWordLight{0%,100%{background-position:100% 50%}50%{background-position:0 50%}}
+@keyframes stageWordBreathe{
+  0%,100%{-webkit-text-stroke-color:rgba(133,174,117,.028);filter:drop-shadow(0 0 0 rgba(102,212,22,0))}
+  50%{-webkit-text-stroke-color:rgba(150,196,132,.055);filter:drop-shadow(0 0 10px rgba(102,212,22,.016))}
+}
+@media(prefers-reduced-motion:reduce){.stage-word{animation:none}}
+@media(max-width:900px){.stage-word{font-size:78vw}}
+
 /* Крупные числа — градиентной заливкой по тексту и со свечением.
    Плоский зелёный на них смотрелся как обычная подпись. */
 .big-n{
@@ -778,8 +808,21 @@ tbody tr.sel .rank{color:var(--brand)}
 .hz li::before{content:'';position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--brand-dim)}
 .hz .soon{color:var(--ink4);font-size:15.5px;line-height:1.5}
 
-footer{margin-top:76px;padding:26px 0 0;border-top:1px solid rgba(255,255,255,.05);
-  color:var(--ink4);font-size:14px;line-height:1.65}
+/* Финал презентации, а не сноска: раньше тут висела служебная пометка про
+   мокап. Благодарность набрана тем же градиентом с подсветкой, что и
+   крупные числа дашборда, — финал читается частью той же системы, а не
+   случайной строкой. Ниже подпись школы капителью: два уровня вместо
+   одного дают экрану законченность, но ничего лишнего не добавляют. */
+footer{margin-top:96px;padding:54px 0 38px;border-top:1px solid rgba(255,255,255,.05);
+  text-align:center}
+footer .thanks{display:block;font-size:clamp(28px,3.4vw,54px);font-weight:760;
+  line-height:1.12;letter-spacing:-.01em;
+  background:linear-gradient(170deg,#F2FFE4 4%,var(--brand-hi) 38%,var(--brand) 82%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  filter:drop-shadow(0 0 30px rgba(102,212,22,.26))}
+footer .sign{display:block;margin-top:20px;color:var(--ink4);font-size:11px;
+  font-weight:750;letter-spacing:.22em;text-transform:uppercase}
 footer b{color:var(--ink3);font-weight:600}
 
 /* системная настройка «уменьшить движение»: разделы показываются сразу,
@@ -1007,11 +1050,13 @@ body::after{content:'';position:fixed;left:0;right:0;bottom:0;height:84px;z-inde
   .orbit-nums strong{color:var(--ink2);font-size:14px}
   .orbit-qual{color:var(--brand);font-size:10.5px;font-weight:700;padding:4px 7px;border-radius:7px;
     background:rgba(102,212,22,.12);white-space:nowrap}
-  footer{margin-top:52px;font-size:12.5px}
+  footer{margin-top:64px;padding:38px 0 26px}
 }
 </style>
 </head>
 <body>
+
+<div class="stage-bg" aria-hidden="true"><span class="stage-word">ZIS</span></div>
 
 <header>
   <div class="logo">
@@ -1404,13 +1449,15 @@ const T={
  linkOff:{kz:'ішкі дерек',ru:'встроенные данные'},
  linkLocal:{kz:'офлайн',ru:'офлайн'},
  replay:{kz:'Желінің өсуін қайта көрсету',ru:'Показать рост сети заново'},
- srcTitle:{kz:'Дерек көзі',ru:'Источник данных'},
- srcOnline:{kz:'Онлайн дерек',ru:'Онлайн-данные'},
- srcOnlineHint:{kz:'Google Sheets кестесінен жаңарып тұрады',ru:'обновляются из таблицы Google Sheets'},
+ srcTitle:{kz:'Деректер',ru:'Данные'},
+ srcOnline:{kz:'Онлайн',ru:'Онлайн'},
+ srcOnlineHint:{kz:'Сандар өзгерген сайын өздігінен жаңарады',ru:'Цифры обновляются сами, как только их меняют'},
  srcOffline:{kz:'Офлайн',ru:'Офлайн'},
- srcOfflineHint:{kz:'интернетсіз, ағымдағы цифрлармен',ru:'без интернета, на текущих цифрах'},
+ srcOfflineHint:{kz:'Соңғы сақталған сандар, интернетсіз',ru:'Последние сохранённые цифры, без интернета'},
  srcRefresh:{kz:'Қазір жаңарту',ru:'Обновить сейчас'},
- srcNoNet:{kz:'желі жоқ',ru:'сети нет'},
+ srcNoNet:{kz:'Онлайн режимде қолжетімді',ru:'Доступно в онлайн-режиме'},
+ srcUpdated:{kz:'жаңартылды',ru:'обновлено'},
+ srcSaved:{kz:'сақталған',ru:'сохранено'},
  sheetWait:{kz:'Google Sheets деректері жүктелуде',ru:'Загружаем данные Google Sheets'},
  s3:{kz:'Нәтижелер',ru:'Результаты'},
  s3s:{kz:'Мемлекеттік грантқа түсу және олимпиадалық өсу',ru:'Поступление на государственный грант и олимпиадный рост'},
@@ -1479,8 +1526,7 @@ const T={
         ru:['Не менее 20 школ в 15+ городах','Не менее 3 школ со стандартом IB','Запатентованная собственная система сети','Образцовая SMART-школа с общежитием','Победители IMO и IFO']},
  fsOn:{kz:'Толық экран (F)',ru:'Во весь экран (F)'},
  fsOff:{kz:'Толық экраннан шығу (F не Esc)',ru:'Выйти из полноэкранного режима (F или Esc)'},
- foot:{kz:'<b>Мокап.</b> Деректер дереккөздерден алынды. Толтыруды күтетіндер: мектеп директорларының аты-жөні, үйірмелер тізімі, төрт мектеп бойынша оқушы саны, салыстыру жылдары. Сызықша қойылған жерде дерек әлі жоқ.',
-       ru:'<b>Мокап.</b> Данные взяты из источников. Ждут заполнения: ФИО директоров школ, список кружков, число учеников по четырём школам, годы сравнения роста. Прочерк означает, что данных пока нет.'},
+ foot:{kz:'Назарларыңызға рақмет',ru:'Спасибо за внимание'},
 };
 
 let lang='kz', sel='ast', yr=null, sk='grants', sd=-1, selCity=null;
@@ -2059,7 +2105,7 @@ function secStrategy(){
 
  <div class="orbwrap"><div class="orbstage">${orbitSvg()}${orbTip()}</div>${orbitMobile()}</div>
 
- <footer>${t('foot')}</footer></section>`;
+ <footer><span class="thanks">${t('foot')}</span><span class="sign">Zerdeli International School</span></footer></section>`;
 }
 
 function render(keep){
@@ -2213,6 +2259,33 @@ function setOrb(i){
  if(fl){void fl.offsetWidth; fl.style.width=fl.dataset.w+'%'}
 }
 function sortBy(k){if(sk===k)sd*=-1;else{sk=k;sd=-1}render(1)}
+/* ── иконка вкладки ── */
+/* Знак для вкладки берём тот же, что в шапке, и рисуем его через канвас,
+   а не подставляем ссылкой на исходник: логотип 75×110, то есть вытянутый,
+   и браузер вписал бы его в квадратную ячейку вкладки со сплющиванием.
+   Здесь он вписывается с сохранением пропорций и полем по краям. Заодно
+   не приходится второй раз класть в файл восемь килобайт base64 — берём
+   уже загруженную картинку. */
+function setFavicon(){
+ const mark=document.querySelector("header .mark");
+ if(!mark)return;
+ const draw=()=>{
+  if(!mark.naturalWidth)return;
+  const n=128, c=document.createElement("canvas");
+  c.width=c.height=n;
+  const g=c.getContext("2d");
+  const k=Math.min(n*.84/mark.naturalWidth,n*.84/mark.naturalHeight);
+  const w=mark.naturalWidth*k, h=mark.naturalHeight*k;
+  g.drawImage(mark,(n-w)/2,(n-h)/2,w,h);
+  let link=document.querySelector('link[rel="icon"]');
+  if(!link){link=document.createElement("link");link.rel="icon";document.head.appendChild(link)}
+  link.type="image/png";
+  try{link.href=c.toDataURL("image/png")}catch(_){link.href=mark.src}
+ };
+ if(mark.complete)draw(); else mark.addEventListener("load",draw,{once:true});
+}
+setFavicon();
+
 /* ── полноэкранный режим ── */
 const FS_IN ='<path d="M3 8V3h5M16 3h5v5M21 16v5h-5M8 21H3v-5"/>';
 const FS_OUT='<path d="M8 3v5H3M21 8h-5V3M16 21v-5h5M3 16h5v5"/>';
@@ -2783,12 +2856,12 @@ function paintLink(){
  const waiting=sheetState.status==='waiting';
  /* подпись источника попадает в меню на виду у зала, поэтому она двуязычна */
  const via={
-  api:{kz:'Apps Script JSON',ru:'Apps Script JSON'},
-  cache:{kz:'Google Sheets көшірмесі',ru:'копия Google Sheets'},
-  snapshot:{kz:'файлдағы көшірме',ru:'копия в файле'},
-  csv:{kz:'Google Sheets CSV',ru:'Google Sheets CSV'},
-  memory:{kz:'Google Sheets — ағымдағы сеанс',ru:'Google Sheets — текущая сессия'},
-  embedded:{kz:'файлдағы дерек',ru:'данные из файла'}
+  api:{kz:'кестеден',ru:'из таблицы'},
+  cache:{kz:'кестеден',ru:'из таблицы'},
+  snapshot:{kz:'файлдан',ru:'из файла'},
+  csv:{kz:'кестеден',ru:'из таблицы'},
+  memory:{kz:'кестеден',ru:'из таблицы'},
+  embedded:{kz:'файлдан',ru:'из файла'}
  }[sheetState.source]?.[lang]||sheetState.source;
  const off=offlineMode();
  el.className='link '+(off?'local':ok?'ok':waiting?'wait':'off');
@@ -2813,7 +2886,17 @@ function paintLink(){
 function paintSrcMenu(via){
  const box=document.getElementById('srcmenu'); if(!box)return;
  const off=offlineMode();
- const stamp=sheetState.when?`${via} · ${sheetState.when}`:via;
+ /* Под активным пунктом показываем не откуда взяты данные, а когда они
+    получены: зрителю в зале важно именно это, а не механика загрузки.
+    Дата снимка приходит как 2026-08-01 — в таком виде она читается кодом,
+    поэтому переводим её в слова на языке интерфейса. */
+ const когда=(()=>{
+  const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(sheetState.when||'');
+  if(!m)return sheetState.when||'';
+  return new Date(+m[1],+m[2]-1,+m[3])
+   .toLocaleDateString(lang==='kz'?'kk-KZ':'ru-RU',{day:'numeric',month:'long',year:'numeric'});
+ })();
+ const stamp=когда?`${off?t('srcSaved'):t('srcUpdated')} ${когда}`:via;
  const opt=(mode,key,hint,active)=>
   `<button class="srcopt ${active?'on':''}" onclick="setSheetMode('${mode}')">
      <i></i><span><b>${t(key)}</b><s>${hint}</s></span>
